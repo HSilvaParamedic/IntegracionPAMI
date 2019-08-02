@@ -1,24 +1,38 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
 using IntegracionPAMI.APIConsumer.Dto;
+using IntegracionPAMI.APIConsumer.Helpers;
 
 namespace IntegracionPAMI.Services
 {
-	public static class IntegracionPAMIManager
+	public class IntegracionPAMIManager
 	{
+		private readonly IIntegracionServices _integracionServices;
+		public IntegracionPAMIManager(IIntegracionServices servicioServices)
+		{
+			ApiHelper.InitializeClient();
+			_integracionServices = servicioServices;
+		}
+
 		public static APIConsumer.Services.ServicioServices servicioServices = new APIConsumer.Services.ServicioServices();
 
-		public static async void GuardarNuevosServicios()
+		public async void GuardarNuevosServicios()
 		{
-			IEnumerable<NotificationDto> notificaciones = await servicioServices.GetNuevasNotifications();
+			IEnumerable<NotificationDto> notificacions = await servicioServices.GetNuevasNotifications();
 
-			foreach (NotificationDto notificacion in notificaciones.Where(n=>n.NotificationType ==  "Nuevo"))
+			foreach (NotificationDto notification in notificacions.Where(n=>n.NotificationType ==  "Nuevo"))
 			{
-				ServiceDto service = await servicioServices.GetServicio(notificacion.ServiceID);
+				ServiceDto service = await servicioServices.GetServicio(notification.ServiceID);
 
-				//TODO: GuardarServicio en BD
+				bool isSuccess = _integracionServices.AlmacenarEnBaseDedatos(service);
 
-				await servicioServices.ReconocerNotification(notificacion.ServiceID, notificacion.Order);
+				if(isSuccess)
+				{
+					await servicioServices.ReconocerNotification(notification.ServiceID, notification.Order);
+				}
+				{
+
+				}
 			}
 		}
 	}

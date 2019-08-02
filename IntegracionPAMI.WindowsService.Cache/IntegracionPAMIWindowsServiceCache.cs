@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Configuration;
 using System.ServiceProcess;
 using IntegracionPAMI.Services;
+using IntegracionPAMI.WindowsService.Cache.Services;
 
 namespace IntegracionPAMI.WindowsService.Cache
 {
@@ -11,6 +12,7 @@ namespace IntegracionPAMI.WindowsService.Cache
 	{
 		private int eventId = 1;
 		Timer timer;
+		private readonly IntegracionPAMIManager _integracionPAMIManager;
 
 		public IntegracionPAMIWindowsServiceCache()
 		{
@@ -23,6 +25,7 @@ namespace IntegracionPAMI.WindowsService.Cache
 			}
 			eventLog.Source = this.ServiceName;
 			eventLog.Log = "Application";
+			_integracionPAMIManager = new IntegracionPAMIManager(new IntegracionService());
 		}
 
 		protected override void OnStart(string[] args)
@@ -50,7 +53,7 @@ namespace IntegracionPAMI.WindowsService.Cache
 		{
 			try
 			{
-				IntegracionPAMIManager.GuardarNuevosServicios();
+				_integracionPAMIManager.GuardarNuevosServicios();
 			}
 			catch (Exception ex)
 			{

@@ -65,6 +65,7 @@
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\IntegracionService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -78,8 +79,12 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\IntegracionPAMI.APIConsumer\IntegracionPAMI.APIConsumer.csproj">
+      <Project>{5593f59c-fa70-422f-9c03-e4c152c32ceb}</Project>
+      <Name>IntegracionPAMI.APIConsumer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\IntegracionPAMI.Services\IntegracionPAMI.Services.csproj">
-      <Project>{3360F087-3274-4BE9-BA1A-073D110C3974}</Project>
+      <Project>{3360f087-3274-4be9-ba1a-073d110c3974}</Project>
       <Name>IntegracionPAMI.Services</Name>
     </ProjectReference>
   </ItemGroup>

@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>IntegracionPAMI.APIConsumer</RootNamespace>
-    <AssemblyName>IntegracionPAMI.Services</AssemblyName>
+    <AssemblyName>IntegracionPAMI.APIConsumer</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
