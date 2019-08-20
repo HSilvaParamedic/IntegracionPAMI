@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using IntegracionPAMI.APIConsumer.Dto;
 using IntegracionPAMI.APIConsumer.Helpers;
+using System.Data;
 
 namespace IntegracionPAMI.Services
 {
@@ -37,6 +38,15 @@ namespace IntegracionPAMI.Services
 					throw new Exception("Hubo un inconveniente al almacenar el servicio en la BD");
 				}
 			}
+		}
+
+		public void EnviarEstadosAsignacion()
+		{
+			DataTable estadoAsignacion = _integracionServices.GetEstadosAsignacion();
+
+			//servicioServices.SetAssigmentState();
+			//mapear al objeto ellos
+			//
 		}
 	}
 }

@@ -26,7 +26,7 @@ namespace IntegracionPAMI.APIConsumer.Services
 		{
 			JObject jsonObject = new JObject(new JProperty("serviceID", servicioId), new JProperty("order", order.ToString()));
 			StringContent content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
-			HttpResponseMessage response =  ApiHelper.ApiClient.PostAsync(ConfigurationManager.AppSettings.Get("API_Endpoint_AcknowledgeNotification"), content).Result;
+			HttpResponseMessage response =  ApiHelper.ApiClient.PutAsync(ConfigurationManager.AppSettings.Get("API_Endpoint_AcknowledgeNotification"), content).Result;
 		}
 
 		public ServiceDto GetServicio(string id)
@@ -38,5 +38,43 @@ namespace IntegracionPAMI.APIConsumer.Services
 
 			return service;
 		}
+
+		public void SetAssigmentState(string servicioId, string description)
+		{
+			JObject jsonObject = new JObject(new JProperty("serviceID", servicioId), new JProperty("description", description));
+			StringContent content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
+			HttpResponseMessage response = ApiHelper.ApiClient.PutAsync(ConfigurationManager.AppSettings.Get("API_Endpoint_SetAssignmentState"), content).Result;
+		}
 	}
 }
+//[
+//    {
+//        "description": "Informado al recurso"
+//    },
+//    {
+//        "description": "Despachado"
+//    },
+//    {
+//        "description": "Rumbo a incidente"
+//    },
+//    {
+//        "description": "En incidente"
+//    },
+//    {
+//        "description": "En espera de derivación"
+//    },
+//    {
+//        "description": "Rumbo a lugar de derivación"
+//    },
+//    {
+//        "description": "En lugar de derivación"
+//    },
+//    {
+//        "description": "Rumbo a base/Deja al paciente"
+//    },
+//    {
+//        "description": "Disponible"
+//    }
+//]
+
+	//{"ServiceID":"0010004173", "Description":"Disponible"}

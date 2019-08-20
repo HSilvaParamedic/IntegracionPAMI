@@ -78,5 +78,22 @@ namespace IntegracionPAMI.Test.Services
 
 			Assert.IsNotNull(false);
 		}
+
+		[TestMethod]
+		public void EnviarEstadosAsignacionTest()
+		{
+			Logger _logger = LogManager.GetCurrentClassLogger();
+			try
+			{
+				IntegracionPAMIManager integracionPAMIManager = new IntegracionPAMIManager(new IntegracionService());
+				integracionPAMIManager.EnviarEstadosAsignacion();
+			}
+			catch (Exception ex)
+			{
+				_logger.Error(ex, ex.Message);
+			}
+
+			Assert.IsNotNull(false);
+		}
 	}
 }

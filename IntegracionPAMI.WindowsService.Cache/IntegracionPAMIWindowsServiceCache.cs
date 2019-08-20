@@ -59,6 +59,7 @@ namespace IntegracionPAMI.WindowsService.Cache
 			try
 			{
 				_integracionPAMIManager.GuardarNuevosServicios();
+				_integracionPAMIManager.EnviarEstadosAsignacion();
                 /// Envío de estados de Servicio
                 
 			}

@@ -5,6 +5,7 @@ using IntegracionPAMI.Services;
 using IntegracionPAMI.APIConsumer.Dto;
 using NLog;
 using System.Linq;
+using System.Data;
 
 namespace IntegracionPAMI.WindowsService.Cache.Services
 {
@@ -54,6 +55,11 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 				_logger.Error(ex, ex.Message);
 				return false;
 			}
+		}
+
+		public DataTable GetEstadosAsignacion()
+		{
+			throw new NotImplementedException();
 		}
 
 		private ConnectionStringCache GetConnectionStringCache()
@@ -128,9 +134,5 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 			}
 		}
 
-        public bool EnviarEstadosAsignacion(ServiceDto serviceFromAPI)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

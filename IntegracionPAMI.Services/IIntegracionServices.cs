@@ -1,6 +1,7 @@
 ﻿
 
 using IntegracionPAMI.APIConsumer.Dto;
+using System.Data;
 
 namespace IntegracionPAMI.Services
 {
@@ -8,7 +9,7 @@ namespace IntegracionPAMI.Services
 	{
 		bool AlmacenarEnBaseDedatos(ServiceDto serviceFromAPI);
 
-        bool EnviarEstadosAsignacion(ServiceDto serviceFromAPI);
+		DataTable GetEstadosAsignacion();
     }
 
 
