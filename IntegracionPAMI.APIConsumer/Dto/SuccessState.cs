@@ -2,7 +2,7 @@
 
 namespace IntegracionPAMI.APIConsumer.Dto
 {
-	public abstract class SuccessState
+	public class SuccessState
 	{
 		public bool IsSuccess { get; set; }
 		public string Message { get; set; }

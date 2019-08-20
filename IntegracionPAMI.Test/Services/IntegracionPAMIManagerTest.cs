@@ -2,6 +2,10 @@
 using System.Text;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Configuration;
+using IntegracionPAMI.Services;
+using IntegracionPAMI.WindowsService.Cache.Services;
+using NLog;
 
 namespace IntegracionPAMI.Test.Services
 {
@@ -61,9 +65,18 @@ namespace IntegracionPAMI.Test.Services
 		[TestMethod]
 		public void GuardarNuevosServiciosTest()
 		{
-			//ServiceDto servicio = new ServicioServices().GetServicio("2000000001").Result;
+			Logger _logger = LogManager.GetCurrentClassLogger();
+			try
+			{
+				IntegracionPAMIManager integracionPAMIManager = new IntegracionPAMIManager(new IntegracionService());
+				integracionPAMIManager.GuardarNuevosServicios();
+			}
+			catch (Exception ex)
+			{
+				_logger.Error(ex, ex.Message);
+			}
 
-			//Assert.IsNotNull(servicio);
+			Assert.IsNotNull(false);
 		}
 	}
 }

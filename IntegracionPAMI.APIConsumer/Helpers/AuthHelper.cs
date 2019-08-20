@@ -14,6 +14,9 @@ namespace IntegracionPAMI.APIConsumer.Helpers
 	public class AuthHelper
 	{
 		private static TokenInfoDto tokenInfo;
+		private static string username = ConfigurationManager.AppSettings.Get("API_Username");
+		private static string password = ConfigurationManager.AppSettings.Get("API_Password");
+		private static string APIEndpointGetToken = ConfigurationManager.AppSettings.Get("API_Endpoint_GetToken");
 
 		public static async Task<TokenInfoDto> GetTokenInfo()
 		{
@@ -26,9 +29,6 @@ namespace IntegracionPAMI.APIConsumer.Helpers
 
 		private static async Task<TokenInfoDto> GetTokenInfoFromApi()
 		{
-			string username = ConfigurationManager.AppSettings.Get("Username");
-			string password = ConfigurationManager.AppSettings.Get("Password");
-
 			FormUrlEncodedContent bodyContent = new FormUrlEncodedContent(new[]
 			{
 				new KeyValuePair<string, string>("grant_type", "password"),
@@ -36,14 +36,8 @@ namespace IntegracionPAMI.APIConsumer.Helpers
 				new KeyValuePair<string, string>("password", password)
 			});
 
-			using (HttpResponseMessage response = await ApiHelper.ApiClient.PostAsync("GeoAPI/GetToken", bodyContent))
+			using (HttpResponseMessage response = await ApiHelper.ApiClient.PostAsync(APIEndpointGetToken, bodyContent))
 			{
-				if (response.StatusCode != System.Net.HttpStatusCode.OK)
-				{
-					//TODO: Loguer statud Code
-					return null;
-				}
-
 				return JsonConvert.DeserializeObject<TokenInfoDto>(await response.Content.ReadAsStringAsync());
 			}
 		}

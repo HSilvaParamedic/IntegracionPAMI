@@ -2,6 +2,7 @@
 {
 	public class ServiceDto : SuccessState
 	{
+		public string Id { get; set; }
 		public string ResponseAgent { get; set; }
 		public string Clasification { get; set; }
 		public string ResponseAgentClass { get; set; }

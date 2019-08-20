@@ -19,22 +19,41 @@ namespace IntegracionPAMI.APIConsumer.Handlers
 			{
 				var response = await base.SendAsync(request, cancellationToken);
 
-				if(response.StatusCode != System.Net.HttpStatusCode.OK)
-				{
-					error = $"API error - HttpCode: {(int)response.StatusCode}, HttpDescription: {System.Net.HttpStatusCode.OK.ToString()}";
-				}
+				string responseMessage = await response.Content.ReadAsStringAsync();
 
 				if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
 				{
-					ErrorDto erroDto = JsonConvert.DeserializeObject<ErrorDto>(await response.Content.ReadAsStringAsync());
-					_logger.Error($"{error} - ( Code: {erroDto.Code}, Description: {erroDto.Description})");
+					if(responseMessage.Contains("error_description"))
+					{
+						ErrorDto erroDto = JsonConvert.DeserializeObject<ErrorDto>(responseMessage);
+						error = $"Authentication Error - ( Code: {erroDto.Code}, Description: {erroDto.Description})";
+					}
+					else
+					{
+						error = responseMessage;
+					}
+					throw new Exception(error);
 				}
+				else if (response.StatusCode == System.Net.HttpStatusCode.OK)
+				{
+					if (!responseMessage.Contains("access_token"))
+					{
+						SuccessState successState = JsonConvert.DeserializeObject<SuccessState>(responseMessage);
+
+						if (!successState.IsSuccess)
+						{
+							error = successState.Message;
+							throw new Exception(error);
+						}
+					}
+				}
+
 				return response;
 			}
 			catch (Exception ex)
 			{
-				_logger.Error($"Failed to get response: {ex}");
-				throw;
+				_logger.Error(ex, "Failed to get response");
+				throw ex;
 			}
 		}
 	}

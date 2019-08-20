@@ -28,18 +28,13 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.eventLog = new System.Diagnostics.EventLog();
-			((System.ComponentModel.ISupportInitialize)(this.eventLog)).BeginInit();
 			// 
 			// IntegracionPAMIWindowsServiceCache
 			// 
 			this.ServiceName = "IntegracionPAMI_Cache";
-			((System.ComponentModel.ISupportInitialize)(this.eventLog)).EndInit();
 
 		}
 
 		#endregion
-
-		private System.Diagnostics.EventLog eventLog;
 	}
 }

@@ -5,48 +5,53 @@ using System.Configuration;
 using System.ServiceProcess;
 using IntegracionPAMI.Services;
 using IntegracionPAMI.WindowsService.Cache.Services;
+using NLog;
 
 namespace IntegracionPAMI.WindowsService.Cache
 {
 	public partial class IntegracionPAMIWindowsServiceCache : ServiceBase
 	{
+		private static Logger _logger = LogManager.GetCurrentClassLogger();
 		private int eventId = 1;
-		Timer timer;
+		private Timer timer;
 		private readonly IntegracionPAMIManager _integracionPAMIManager;
 
 		public IntegracionPAMIWindowsServiceCache()
 		{
 			InitializeComponent();
-			//System.Diagnostics.EventLog.DeleteEventSource(this.ServiceName);
-			eventLog = new EventLog();
-			if (!EventLog.SourceExists(this.ServiceName))
+
+			try
 			{
-				EventLog.CreateEventSource(this.ServiceName, "Appication");
+				_integracionPAMIManager = new IntegracionPAMIManager(new IntegracionService());
 			}
-			eventLog.Source = this.ServiceName;
-			eventLog.Log = "Application";
-			_integracionPAMIManager = new IntegracionPAMIManager(new IntegracionService());
+			catch (Exception ex)
+			{
+				_logger.Error(ex, ex.Message);
+				throw ex;
+			}
 		}
 
 		protected override void OnStart(string[] args)
 		{
 			try
 			{
-				int intervaloDeEjecucion = 6;//int.Parse(ConfigurationManager.AppSettings.Get("IntervaloDeEjecucion_Mins"));
-
 				timer = new Timer();
-				timer.Interval = intervaloDeEjecucion * 10000;
+				timer.Interval = int.Parse(ConfigurationManager.AppSettings.Get("IntervaloDeEjecucion_Mins")) * 10000;
 				timer.Elapsed += new ElapsedEventHandler(this.OnTimer);
 				timer.Start();
+
+				_logger.Info("Se inició el servicio");
 			}
 			catch (Exception ex)
 			{
-				eventLog.WriteEntry(ex.Message, EventLogEntryType.Error);
+				_logger.Error(ex, ex.Message);
+				throw ex;
 			}
 		}
 
 		protected override void OnStop()
 		{
+			_logger.Info("Se detuvo el servicio");
 		}
 
 		private void OnTimer(object sender, ElapsedEventArgs args)
@@ -57,7 +62,7 @@ namespace IntegracionPAMI.WindowsService.Cache
 			}
 			catch (Exception ex)
 			{
-				eventLog.WriteEntry(ex.Message, EventLogEntryType.Error);
+				_logger.Error(ex, ex.Message);
 			}
 		}
 	}

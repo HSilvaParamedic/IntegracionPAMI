@@ -63,7 +63,7 @@ namespace IntegracionPAMI.Test.APIConsumer.Services
 		public void TestMethod1()
 		{
 			ServicioServices servicioService = new ServicioServices();
-			IEnumerable<NotificationDto> notifications = servicioService.GetNuevasNotifications().Result;
+			IEnumerable<NotificationDto> notifications = servicioService.GetNuevasNotifications();
 			Assert.IsNotNull(notifications);
 		}
 	}

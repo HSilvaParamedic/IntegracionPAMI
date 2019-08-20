@@ -9,6 +9,6 @@ namespace IntegracionPAMI.APIConsumer.Dto
 		public string ServiceID { get; set; }
 		public int Order { get; set; }
 		public string ResponseAgent { get; set; }
-		public string Clasification { get; set; }
+		public string Classification { get; set; }
 	}
 }

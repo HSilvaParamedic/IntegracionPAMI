@@ -60,7 +60,7 @@ namespace IntegracionPAMI.Test.Services
 		[TestMethod]
 		public void GetNotificaciones()
 		{
-			IEnumerable<NotificationDto> notificaciones = new ServicioServices().GetNuevasNotifications().Result;
+			IEnumerable<NotificationDto> notificaciones = new ServicioServices().GetNuevasNotifications();
 
 			Assert.IsNotNull(notificaciones);
 		}
@@ -68,7 +68,7 @@ namespace IntegracionPAMI.Test.Services
 		[TestMethod]
 		public void GetServicios()
 		{
-			ServiceDto servicio = new ServicioServices().GetServicio("2000000001").Result;
+			ServiceDto servicio = new ServicioServices().GetServicio("2000000001");
 
 			Assert.IsNotNull(servicio);
 		}

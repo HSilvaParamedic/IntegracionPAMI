@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegracionPAMI.Services", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegracionPAMI.WindowsService.Cache", "IntegracionPAMI.WindowsService.Cache\IntegracionPAMI.WindowsService.Cache.csproj", "{C33ADC19-C818-4522-90ED-25818934EEF2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShamanClases_CSharp", "..\ShamanClases\ShamanClases_CSharp\ShamanClases_CSharp.csproj", "{E9DEC2D3-6082-454D-8F3D-D2456286371D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{C33ADC19-C818-4522-90ED-25818934EEF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C33ADC19-C818-4522-90ED-25818934EEF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C33ADC19-C818-4522-90ED-25818934EEF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9DEC2D3-6082-454D-8F3D-D2456286371D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9DEC2D3-6082-454D-8F3D-D2456286371D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9DEC2D3-6082-454D-8F3D-D2456286371D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9DEC2D3-6082-454D-8F3D-D2456286371D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +52,7 @@ Global
 		{35F33058-5FC3-48F0-96AF-2FA2A9C27114} = {F61D207E-D0AE-4C4E-854A-53D62CB9000D}
 		{3360F087-3274-4BE9-BA1A-073D110C3974} = {DADE6286-86C8-4925-A1A0-369D7EEDE8F6}
 		{C33ADC19-C818-4522-90ED-25818934EEF2} = {DADE6286-86C8-4925-A1A0-369D7EEDE8F6}
+		{E9DEC2D3-6082-454D-8F3D-D2456286371D} = {DADE6286-86C8-4925-A1A0-369D7EEDE8F6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A868798A-6E3A-4C71-B47B-133B30A95421}
