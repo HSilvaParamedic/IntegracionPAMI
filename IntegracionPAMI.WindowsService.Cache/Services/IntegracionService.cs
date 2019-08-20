@@ -127,5 +127,10 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 					throw new Exception("No se reconoce la unidad de la edad");
 			}
 		}
-	}
+
+        public bool EnviarEstadosAsignacion(ServiceDto serviceFromAPI)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
