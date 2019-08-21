@@ -5,8 +5,10 @@ using IntegracionPAMI.APIConsumer.Dto;
 using NLog;
 using System.Linq;
 using System.Data;
+using System.Data.SqlClient;
+using ShamanExpressDLL;
 
-namespace IntegracionPAMI.WindowsService.Cache.Services
+namespace IntegracionPAMI.WindowsService.SQL.Services
 {
     public class IntegracionService : IIntegracionServices
     {
@@ -18,81 +20,268 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
         {
             try
             {
-                /*
-                ConnectionStringCache connectionStringCache = GetConnectionStringCache();
 
-                new GalenoServicios(connectionStringCache).SetServicio(
-                    cliCod,
-                    nroAut,
-                    serviceDto.Id,
-                    $"{serviceDto.Address.StreetName} {serviceDto.Address.FloorApt}",
-                    int.Parse(serviceDto.Address.HouseNumber),
-                    0,
-                    "",
-                    serviceDto.Address.BetweenStreet1,
-                    serviceDto.Address.BetweenSteet2,
-                    "",
-                    serviceDto.BeneficiaryName,
-                    serviceDto.Gender,
-                    MapEdad(serviceDto.Age, serviceDto.AgeUnit),
-                    serviceDto.Triage.Last().Reason,
-                    "",
-                    serviceDto.Address.City,
-                    serviceDto.BeneficiaryID,
-                    new DateTime(serviceDto.TimeRequested.Year, serviceDto.TimeRequested.Month, serviceDto.TimeRequested.Day),
-                    $"{serviceDto.TimeRequested.Hour}:{serviceDto.TimeRequested.Minute}",
-                    0,
-                    "",
-                    MapGrado(serviceDto.Clasification),
-                    "",
-                    serviceDto.OriginComments
-                );
-                */
+                if (this.SQLConnect())
+                {
 
-                return true;
+                    conConfiguracionesRegionales objConfigEquivalencias = new conConfiguracionesRegionales();
+
+                    conPreIncidentes preInc = new conPreIncidentes();
+                    conClientes objCliente = new conClientes();
+
+                    preInc.CleanProperties(preInc);
+
+                    preInc.ClienteId.SetObjectId(objCliente.GetIDByAbreviaturaId(cliCod).ToString());
+                    preInc.NroServicio = serviceDto.Id;
+                    preInc.Domicilio.dmCalle = serviceDto.Address.StreetName + ' ' + serviceDto.Address.HouseNumber + ' ' + serviceDto.Address.FloorApt;
+                    preInc.Domicilio.dmEntreCalle1 = serviceDto.Address.BetweenStreet1;
+                    preInc.Domicilio.dmEntreCalle2 = serviceDto.Address.BetweenSteet2;
+                    preInc.errLocalidad = serviceDto.Address.City;
+
+                    preInc.NroAfiliado = serviceDto.BeneficiaryID;
+                    preInc.Paciente = serviceDto.BeneficiaryName;
+                    preInc.Sexo = serviceDto.Gender;
+                    preInc.Edad = Convert.ToDecimal( MapEdad(serviceDto.Age, serviceDto.AgeUnit));
+                    preInc.Sintomas = serviceDto.Triage.Last().Reason;
+                    preInc.errGradoOperativo = serviceDto.Clasification;
+
+                    //// Busco equivalencias
+
+                    long cnfId = objConfigEquivalencias.GetIDByClienteId(Convert.ToInt64(preInc.ClienteId.GetObjectId()));
+                    preInc.GradoOperativoId.SetObjectId(getGradoOperativoId(cnfId, MapGrado(serviceDto.Clasification)).ToString());
+                    preInc.LocalidadId.SetObjectId(getLocalidadId(cnfId, serviceDto.Address.City).ToString());
+                    
+                    preInc.MetodoIngresoId = modDeclares.preIncidenteOrigen.RestServicePAMI;
+                    preInc.Observaciones = serviceDto.OriginComments;
+
+                    preInc.FecHorServicio = serviceDto.TimeRequested;
+
+                    bool savOk = preInc.Salvar(preInc);
+
+                    preInc = null;
+                    objConfigEquivalencias = null;
+                    objCliente = null;
+
+                    return savOk;
+
+                }
+
             }
             catch (Exception ex)
             {
                 _logger.Error(ex, ex.Message);
-                return false;
+            }
+            return false;
+
+        }
+
+
+        private long getGradoOperativoId(long cnfId, string grado)
+        {
+
+            long gdo = 0;
+
+            if (cnfId > 0)
+            {
+
+                conConfiguracionesRegionalesReglas objEquivalencias = new conConfiguracionesRegionalesReglas();
+                gdo = Convert.ToInt64(objEquivalencias.GetValor1(cnfId, grado, 103));
+
+            }
+
+            if (gdo == 0)
+            {
+
+                conGradosOperativos objGrados = new conGradosOperativos();
+                gdo = objGrados.GetIDByAbreviaturaId(grado);
+
+                if (gdo == 0)
+                {
+                    gdo = objGrados.GetIDByDescripcion(grado);
+                }
+
+            }
+
+            return gdo;
+        }
+
+        private long getLocalidadId(long cnfId, string localidad)
+        {
+            try
+            {
+                long loc = 0;
+
+                if (cnfId > 0)
+                {
+
+                    conConfiguracionesRegionalesReglas objEquivalencias = new conConfiguracionesRegionalesReglas();
+                    string devStr = objEquivalencias.GetValor1(cnfId, localidad, 104);
+                    if (!string.IsNullOrEmpty(devStr))
+                    {
+                        loc = Convert.ToInt64(devStr);
+                    }
+
+                }
+
+                if (loc == 0)
+                {
+
+                    conLocalidades objLocalidades = new conLocalidades();
+                    loc = objLocalidades.GetIDByAbreviaturaId(localidad);
+
+                    if (loc == 0)
+                    {
+                        loc = objLocalidades.GetIDByDescripcion(localidad);
+                    }
+
+                }
+
+                return loc;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, ex.Message);
+                return 0;
+            }
+        }
+
+        private long getDiagnosticoId(long cnfId, string abreviaturaId, string descripcion)
+        {
+            try
+            {
+                long dig = 0;
+
+                if (cnfId > 0)
+                {
+                    conConfiguracionesRegionalesReglas objEquivalencias = new conConfiguracionesRegionalesReglas();
+                    string devStr = objEquivalencias.GetValor1(cnfId, descripcion, 101);
+                    if (!string.IsNullOrEmpty(devStr))
+                    {
+                        dig = Convert.ToInt64(devStr);
+                    }
+                }
+
+                if (dig == 0)
+                {
+                    conDiagnosticos objDiagnosticos = new conDiagnosticos();
+                    dig = objDiagnosticos.GetIDByAbreviaturaId(abreviaturaId);
+
+                    if (dig == 0)
+                    {
+                        dig = objDiagnosticos.GetIDByDescripcion(descripcion);
+                    }
+
+                }
+
+                return dig;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, ex.Message);
+                return 0;
+            }
+
+        }
+
+        private long getMotivoNoRealizacionId(long cnfId, string abreviaturaId, string descripcion)
+        {
+            try
+            {
+                long mot = 0;
+
+                if (cnfId > 0)
+                {
+
+                    conConfiguracionesRegionalesReglas objEquivalencias = new conConfiguracionesRegionalesReglas();
+                    string devStr = objEquivalencias.GetValor1(cnfId, descripcion, 105);
+                    if (!string.IsNullOrEmpty(devStr))
+                    {
+                        mot = Convert.ToInt64(devStr);
+                    }
+                }
+
+                if (mot == 0)
+                {
+
+                    conMotivosNoRealizacion objMotivos = new conMotivosNoRealizacion();
+                    mot = objMotivos.GetIDByAbreviaturaId(abreviaturaId);
+
+                    if (mot == 0)
+                    {
+                        mot = objMotivos.GetIDByDescripcion(descripcion);
+                    }
+
+                }
+
+                return mot;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, ex.Message);
+                return 0;
             }
         }
 
         public DataTable GetEstadosAsignacion()
         {
-            /*
-            ConnectionStringCache connectionStringCache = GetConnectionStringCache();
-            return new GalenoServicios(connectionStringCache).GetPamiEstadosAsignacionPendientes(cliCod);
-            */
+            if (this.SQLConnect())
+            {
+                conPreIncidentes preMsg = new conPreIncidentes();
+                return preMsg.GetPamiEventos(cliCod);
+            }
             return null;
         }
 
         public bool SetEstadoAsignacionEnviado(decimal pGalenoId, int pEventoId)
         {
-            /*
-            ConnectionStringCache connectionStringCache = GetConnectionStringCache();
-            return new GalenoServicios(connectionStringCache).SetPamiEventoEnviado(pGalenoId, pEventoId);
-            */
-            return true;
+            if (this.SQLConnect())
+            {
+                conPreIncidentes preInc = new conPreIncidentes();
+                typPreIncidentesMensajes preMsg = new typPreIncidentesMensajes();
+
+                preMsg.CleanProperties(preMsg);
+                preMsg.PreIncidenteId.SetObjectId(pGalenoId.ToString());
+                preMsg.MensajeId = (modDeclares.preIncidenteMensaje)pEventoId;
+
+                if (preMsg.Salvar(preMsg))
+                {
+                    return true;
+                }
+
+            }
+            return false;
         }
 
-        /*
-        private ConnectionStringCache GetConnectionStringCache()
+        private bool SQLConnect()
         {
-            string[] connectionStringCacheValues = ConfigurationManager.AppSettings.Get("ConnectionStringCache_Values").Split('|');
-            return new ConnectionStringCache
+            if (modDatabase.cnnsNET.Count > 0)
             {
-                Namespace = connectionStringCacheValues[0],
-                Port = connectionStringCacheValues[1],
-                Server = connectionStringCacheValues[2],
-                Aplicacion = connectionStringCacheValues[3],
-                Centro = connectionStringCacheValues[4],
-                User = connectionStringCacheValues[5],
-                Password = connectionStringCacheValues[6],
-                UserID = connectionStringCacheValues[7]
-            };
+                if (modDatabase.cnnsNET[modDeclares.cnnDefault].State <> ConnectionState.Open)
+                {
+                    modDatabase.cnnsNET.Remove(modDeclares.cnnDefault);
+                }
+                else
+                {
+                    return true;
+                }
+            }
+
+            /// Conecto!
+
+            StartUp objStartUp = new StartUp();
+
+            string[] connectionStringSQLValues = ConfigurationManager.AppSettings.Get("ConnectionStringSQL_Values").Split('|');
+            
+            string cnnStr = string.Format("Data Source={0};multipleactiveresultsets=true;Initial Catalog={1};User Id={2};Password={3};", connectionStringSQLValues[0], connectionStringSQLValues[1], connectionStringSQLValues[2], connectionStringSQLValues[3]);
+
+            if (objStartUp.AbrirConexion("Default", false, cnnStr))
+            {
+                return true;
+            }
+
+            return false;
         }
-        */
+
 
         private string MapGrado(string grade)
         {

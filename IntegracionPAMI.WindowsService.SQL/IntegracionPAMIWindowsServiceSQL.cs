@@ -1,28 +1,70 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+using System.Timers;
 using System.Diagnostics;
-using System.Linq;
+using System.Configuration;
 using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
+using IntegracionPAMI.Services;
+using IntegracionPAMI.WindowsService.SQL.Services;
+using NLog;
 
 namespace IntegracionPAMI.WindowsService.SQL
 {
-	public partial class IntegracionPAMIWindowsServiceSQL : ServiceBase
-	{
-		public IntegracionPAMIWindowsServiceSQL()
-		{
-			InitializeComponent();
-		}
+    public partial class IntegracionPAMIWindowsServiceSQL : ServiceBase
+    {
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
+        private int eventId = 1;
+        private Timer timer;
+        private readonly IntegracionPAMIManager _integracionPAMIManager;
 
-		protected override void OnStart(string[] args)
-		{
-		}
+        public IntegracionPAMIWindowsServiceSQL()
+        {
+            InitializeComponent();
 
-		protected override void OnStop()
-		{
-		}
-	}
+            try
+            {
+                _integracionPAMIManager = new IntegracionPAMIManager(new IntegracionService());
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, ex.Message);
+                throw ex;
+            }
+        }
+
+        protected override void OnStart(string[] args)
+        {
+            try
+            {
+                timer = new Timer();
+                timer.Interval = int.Parse(ConfigurationManager.AppSettings.Get("IntervaloDeEjecucion_Mins")) * 10000;
+                timer.Elapsed += new ElapsedEventHandler(this.OnTimer);
+                timer.Start();
+
+                _logger.Info("Se inició el servicio");
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, ex.Message);
+                throw ex;
+            }
+        }
+
+        protected override void OnStop()
+        {
+            _logger.Info("Se detuvo el servicio");
+        }
+
+        private void OnTimer(object sender, ElapsedEventArgs args)
+        {
+            try
+            {
+                _integracionPAMIManager.GuardarNuevosServicios();
+                _integracionPAMIManager.EnviarEstadosAsignacion();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, ex.Message);
+            }
+        }
+    }
 }
