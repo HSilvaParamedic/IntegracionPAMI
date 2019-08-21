@@ -34,10 +34,18 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.6.6\lib\net45\NLog.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Management" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -65,6 +73,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="NLog.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="IntegracionPAMIWindowsServiceSQL.resx">
@@ -78,6 +93,14 @@
     <ProjectReference Include="..\..\ShamanExpressDLL\ShamanExpressDLL.vbproj">
       <Project>{1a8dfae4-4e6f-4ad5-9b09-cfa395aa2065}</Project>
       <Name>ShamanExpressDLL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\IntegracionPAMI.APIConsumer\IntegracionPAMI.APIConsumer.csproj">
+      <Project>{5593f59c-fa70-422f-9c03-e4c152c32ceb}</Project>
+      <Name>IntegracionPAMI.APIConsumer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\IntegracionPAMI.Services\IntegracionPAMI.Services.csproj">
+      <Project>{3360f087-3274-4be9-ba1a-073d110c3974}</Project>
+      <Name>IntegracionPAMI.Services</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
