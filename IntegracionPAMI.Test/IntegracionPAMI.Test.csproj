@@ -91,10 +91,6 @@
       <Project>{3360F087-3274-4BE9-BA1A-073D110C3974}</Project>
       <Name>IntegracionPAMI.Services</Name>
     </ProjectReference>
-    <ProjectReference Include="..\IntegracionPAMI.WindowsService.Cache\IntegracionPAMI.WindowsService.Cache.csproj">
-      <Project>{C33ADC19-C818-4522-90ED-25818934EEF2}</Project>
-      <Name>IntegracionPAMI.WindowsService.Cache</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

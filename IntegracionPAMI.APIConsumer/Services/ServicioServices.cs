@@ -45,7 +45,15 @@ namespace IntegracionPAMI.APIConsumer.Services
 			StringContent content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
 			HttpResponseMessage response = ApiHelper.ApiClient.PutAsync(ConfigurationManager.AppSettings.Get("API_Endpoint_SetAssignmentState"), content).Result;
 		}
-	}
+
+        public void Finalize(string servicioId)
+        {
+            JObject jsonObject = new JObject(new JProperty("serviceID", servicioId));
+            StringContent content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = ApiHelper.ApiClient.PutAsync(ConfigurationManager.AppSettings.Get("API_Endpoint_Finalize"), content).Result;
+        }
+
+    }
 }
 //[
 //    {

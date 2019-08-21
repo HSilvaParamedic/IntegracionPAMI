@@ -10,6 +10,9 @@ namespace IntegracionPAMI.Services
 		bool AlmacenarEnBaseDedatos(ServiceDto serviceFromAPI);
 
 		DataTable GetEstadosAsignacion();
+
+        bool SetEstadoAsignacionEnviado(decimal pGalenoId, int pEventoId);
+
     }
 
 

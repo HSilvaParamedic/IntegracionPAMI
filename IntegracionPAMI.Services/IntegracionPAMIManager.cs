@@ -42,11 +42,20 @@ namespace IntegracionPAMI.Services
 
 		public void EnviarEstadosAsignacion()
 		{
-			DataTable estadoAsignacion = _integracionServices.GetEstadosAsignacion();
+			DataTable dt = _integracionServices.GetEstadosAsignacion();
 
-			//servicioServices.SetAssigmentState();
-			//mapear al objeto ellos
-			//
+            for (int i = 0; i< dt.Rows.Count; i++)
+            {
+                /// Envío a PAMI
+                servicioServices.SetAssigmentState(dt.Rows[i]["NroServicio"].ToString(), dt.Rows[i]["Evento"].ToString());
+                /// Marco enviado en DB
+                _integracionServices.SetEstadoAsignacionEnviado(Convert.ToDecimal(dt.Rows[i]["NroServicio"].ToString()), Convert.ToInt32(dt.Rows[i]["EventoId"].ToString()));
+                /// Finalizo en PAMI
+                if (Convert.ToInt32(dt.Rows[i]["EventoId"]) == 4)
+                {
+                    servicioServices.Finalize(dt.Rows[i]["NroServicio"].ToString());
+                }
+            }
 		}
 	}
 }

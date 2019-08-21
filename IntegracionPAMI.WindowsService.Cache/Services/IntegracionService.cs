@@ -59,10 +59,18 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 
 		public DataTable GetEstadosAsignacion()
 		{
-			throw new NotImplementedException();
+            ConnectionStringCache connectionStringCache = GetConnectionStringCache();
+            return new GalenoServicios(connectionStringCache).GetPamiEstadosAsignacionPendientes(cliCod);
 		}
 
-		private ConnectionStringCache GetConnectionStringCache()
+        public bool SetEstadoAsignacionEnviado(decimal pGalenoId, int pEventoId)
+        {
+            ConnectionStringCache connectionStringCache = GetConnectionStringCache();
+            return new GalenoServicios(connectionStringCache).SetPamiEventoEnviado(pGalenoId, pEventoId);
+        }
+
+
+        private ConnectionStringCache GetConnectionStringCache()
 		{
 			string[] connectionStringCacheValues = ConfigurationManager.AppSettings.Get("ConnectionStringCache_Values").Split('|');
 			return new ConnectionStringCache
