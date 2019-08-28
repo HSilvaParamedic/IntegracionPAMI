@@ -5,7 +5,7 @@
 		public string StreetName { get; set; }
 		public string HouseNumber { get; set; }
 		public string BetweenStreet1 { get; set; }
-		public string BetweenSteet2 { get; set; }
+		public string BetweenStreet2 { get; set; }
 		public string FloorApt { get; set; }
 		public string AdditionalData { get; set; }
 		public string Province { get; set; }

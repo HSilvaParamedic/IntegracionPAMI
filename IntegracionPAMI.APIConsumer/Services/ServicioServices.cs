@@ -22,7 +22,16 @@ namespace IntegracionPAMI.APIConsumer.Services
 			return notificationList.Notifications.AsEnumerable();
 		}
 
-		public  void ReconocerNotification(string servicioId, int order)
+        public IEnumerable<OngoingServiceDto> GetServiciosEnCurso()
+        {
+            HttpResponseMessage response = ApiHelper.ApiClient.GetAsync(ConfigurationManager.AppSettings.Get("API_Endpoint_GetOngoing")).Result;
+
+            OngoingServicesListDto notificationList = JsonConvert.DeserializeObject<OngoingServicesListDto>(response.Content.ReadAsStringAsync().Result);
+
+            return notificationList.Summary.AsEnumerable();
+        }
+
+        public  void ReconocerNotification(string servicioId, int order)
 		{
 			JObject jsonObject = new JObject(new JProperty("serviceID", servicioId), new JProperty("order", order.ToString()));
 			StringContent content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
@@ -51,6 +60,13 @@ namespace IntegracionPAMI.APIConsumer.Services
             JObject jsonObject = new JObject(new JProperty("serviceID", servicioId));
             StringContent content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
             HttpResponseMessage response = ApiHelper.ApiClient.PutAsync(ConfigurationManager.AppSettings.Get("API_Endpoint_Finalize"), content).Result;
+        }
+
+        public void SetDiagnosticUrgencyDegree(string servicioId, string DiagnosticCode, string UrgencyDegreeCode)
+        {
+            JObject jsonObject = new JObject(new JProperty("ServiceID", servicioId), new JProperty("DiagnosticCode", DiagnosticCode), new JProperty("UrgencyDegreeCode", UrgencyDegreeCode));
+            StringContent content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = ApiHelper.ApiClient.PutAsync(ConfigurationManager.AppSettings.Get("API_Endpoint_SetDiagnosticUrgencyDegree"), content).Result;
         }
 
     }

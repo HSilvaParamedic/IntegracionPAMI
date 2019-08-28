@@ -4,7 +4,7 @@
 	{
 		public string Id { get; set; }
 		public string ResponseAgent { get; set; }
-		public string Clasification { get; set; }
+		public string Classification { get; set; }
 		public string ResponseAgentClass { get; set; }
 		public AddressDto Address { get; set; }
 		public string CustomerName { get; set; }

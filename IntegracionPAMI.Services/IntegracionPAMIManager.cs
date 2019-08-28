@@ -29,7 +29,7 @@ namespace IntegracionPAMI.Services
 
 				bool isSuccess = _integracionServices.AlmacenarEnBaseDedatos(service);
 
-				if(isSuccess)
+				if (isSuccess)
 				{
 					 servicioServices.ReconocerNotification(notification.ServiceID, notification.Order);
 				}
@@ -40,20 +40,34 @@ namespace IntegracionPAMI.Services
 			}
 		}
 
-		public void EnviarEstadosAsignacion()
+        public void GuardarNuevosServiciosDesdeGoing()
+        {
+            IEnumerable<OngoingServiceDto> notificacions = servicioServices.GetServiciosEnCurso();
+
+            foreach (OngoingServiceDto notification in notificacions)
+            {
+                ServiceDto service = servicioServices.GetServicio(notification.Id);
+
+                bool isSuccess = _integracionServices.AlmacenarEnBaseDedatos(service);
+
+            }
+        }
+
+        public void EnviarEstadosAsignacion()
 		{
 			DataTable dt = _integracionServices.GetEstadosAsignacion();
 
             for (int i = 0; i< dt.Rows.Count; i++)
             {
                 /// Envío a PAMI
-                servicioServices.SetAssigmentState(dt.Rows[i]["NroServicio"].ToString(), dt.Rows[i]["Evento"].ToString());
+                servicioServices.SetAssigmentState(dt.Rows[i]["NroServicioString"].ToString(), dt.Rows[i]["Evento"].ToString());
                 /// Marco enviado en DB
-                _integracionServices.SetEstadoAsignacionEnviado(Convert.ToDecimal(dt.Rows[i]["NroServicio"].ToString()), Convert.ToInt32(dt.Rows[i]["EventoId"].ToString()));
+                _integracionServices.SetEstadoAsignacionEnviado(Convert.ToDecimal(dt.Rows[i]["ID"].ToString()), Convert.ToInt32(dt.Rows[i]["EventoId"].ToString()));
                 /// Finalizo en PAMI
-                if (Convert.ToInt32(dt.Rows[i]["EventoId"]) == 4)
+                if ((Convert.ToInt32(dt.Rows[i]["EventoId"]) == 4)||(Convert.ToInt32(dt.Rows[i]["EventoId"]) == 22))
                 {
-                    servicioServices.Finalize(dt.Rows[i]["NroServicio"].ToString());
+                    servicioServices.SetDiagnosticUrgencyDegree(dt.Rows[i]["NroServicioString"].ToString(), dt.Rows[i]["Diagnostico"].ToString(), dt.Rows[i]["GradoOperativo"].ToString());
+                    servicioServices.Finalize(dt.Rows[i]["NroServicioString"].ToString());
                 }
             }
 		}

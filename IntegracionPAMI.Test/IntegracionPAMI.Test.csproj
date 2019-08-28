@@ -67,7 +67,8 @@
     <Compile Include="APIConsumer\Helpers\AuthHelperTest.cs" />
     <Compile Include="APIConsumer\Services\ServicioServiceTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\IntegracionPAMIManagerTest.cs" />
+    <Compile Include="Services\IntegracionPAMIManagerSQLTest.cs" />
+    <Compile Include="Services\IntegracionPAMIManagerCacheTest.cs" />
     <Compile Include="Services\ServicioServicesTest.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -82,10 +83,6 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="..\..\ShamanClases\ShamanClases_CSharp\ShamanClases_CSharp.csproj">
-      <Project>{e9dec2d3-6082-454d-8f3d-d2456286371d}</Project>
-      <Name>ShamanClases_CSharp</Name>
-    </ProjectReference>
     <ProjectReference Include="..\IntegracionPAMI.APIConsumer\IntegracionPAMI.APIConsumer.csproj">
       <Project>{5593f59c-fa70-422f-9c03-e4c152c32ceb}</Project>
       <Name>IntegracionPAMI.APIConsumer</Name>
@@ -93,6 +90,10 @@
     <ProjectReference Include="..\IntegracionPAMI.Services\IntegracionPAMI.Services.csproj">
       <Project>{3360F087-3274-4BE9-BA1A-073D110C3974}</Project>
       <Name>IntegracionPAMI.Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\IntegracionPAMI.WindowsService.SQL\IntegracionPAMI.WindowsService.SQL.csproj">
+      <Project>{bdd2959e-0371-4994-86a3-c2d8b8e59407}</Project>
+      <Name>IntegracionPAMI.WindowsService.SQL</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

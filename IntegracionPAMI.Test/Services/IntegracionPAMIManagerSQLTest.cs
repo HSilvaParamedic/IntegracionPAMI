@@ -1,20 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Text;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using IntegracionPAMI.APIConsumer.Services;
-using IntegracionPAMI.APIConsumer.Dto;
-using IntegracionPAMI.APIConsumer.Helpers;
+using System.Configuration;
+using IntegracionPAMI.Services;
+using IntegracionPAMI.WindowsService.SQL.Services;
+using NLog;
 
 namespace IntegracionPAMI.Test.Services
 {
 	/// <summary>
-	/// Summary description for ServicioServicesTest
+	/// Summary description for IntegracionPAMIManagerTest
 	/// </summary>
 	[TestClass]
-	public class ServicioServicesTest
-	{
-		public ServicioServicesTest()
+	public class IntegracionPAMIManagerSQLTest
+    {
+		public IntegracionPAMIManagerSQLTest()
 		{
-			ApiHelper.InitializeClient();
+			//
+			// TODO: Add constructor logic here
+			//
 		}
 
 		private TestContext testContextInstance;
@@ -58,20 +63,38 @@ namespace IntegracionPAMI.Test.Services
 		#endregion
 
 		[TestMethod]
-		public void GetNotificaciones()
+		public void GuardarNuevosServiciosTest()
 		{
+			Logger _logger = LogManager.GetCurrentClassLogger();
+			try
+			{
+				IntegracionPAMIManager integracionPAMIManager = new IntegracionPAMIManager(new IntegracionService());
+                //integracionPAMIManager.GuardarNuevosServicios();
+                integracionPAMIManager.GuardarNuevosServiciosDesdeGoing();
+            }
+			catch (Exception ex)
+			{
+				_logger.Error(ex, ex.Message);
+			}
 
-			IEnumerable<NotificationDto> notificaciones = new ServicioServices().GetNuevasNotifications();
-
-			Assert.IsNotNull(notificaciones);
+			Assert.IsNotNull(false);
 		}
 
 		[TestMethod]
-		public void GetServicios()
+		public void EnviarEstadosAsignacionTest()
 		{
-			ServiceDto servicio = new ServicioServices().GetServicio("2000000001");
+			Logger _logger = LogManager.GetCurrentClassLogger();
+			try
+			{
+				IntegracionPAMIManager integracionPAMIManager = new IntegracionPAMIManager(new IntegracionService());
+				integracionPAMIManager.EnviarEstadosAsignacion();
+			}
+			catch (Exception ex)
+			{
+				_logger.Error(ex, ex.Message);
+			}
 
-			Assert.IsNotNull(servicio);
+			Assert.IsNotNull(false);
 		}
 	}
 }

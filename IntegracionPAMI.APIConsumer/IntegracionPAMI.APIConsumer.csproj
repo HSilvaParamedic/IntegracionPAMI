@@ -63,8 +63,8 @@
     <Compile Include="Dto\LatLngDto.cs" />
     <Compile Include="Dto\NotificationDto.cs" />
     <Compile Include="Dto\NotificationListDto.cs" />
-    <Compile Include="Dto\OngoingSerivcesList.cs" />
-    <Compile Include="Dto\OngoingSerivce.cs" />
+    <Compile Include="Dto\OngoingServicesListDto.cs" />
+    <Compile Include="Dto\OngoingServiceDto.cs" />
     <Compile Include="Dto\ServiceDto.cs" />
     <Compile Include="Dto\SuccessState.cs" />
     <Compile Include="Dto\TokenInfoDto.cs" />

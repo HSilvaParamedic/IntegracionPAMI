@@ -13,9 +13,9 @@ namespace IntegracionPAMI.Test.Services
 	/// Summary description for IntegracionPAMIManagerTest
 	/// </summary>
 	[TestClass]
-	public class IntegracionPAMIManagerTest
+	public class IntegracionPAMIManagerCacheTest
 	{
-		public IntegracionPAMIManagerTest()
+		public IntegracionPAMIManagerCacheTest()
 		{
 			//
 			// TODO: Add constructor logic here
@@ -69,8 +69,9 @@ namespace IntegracionPAMI.Test.Services
 			try
 			{
 				IntegracionPAMIManager integracionPAMIManager = new IntegracionPAMIManager(new IntegracionService());
-				integracionPAMIManager.GuardarNuevosServicios();
-			}
+                //integracionPAMIManager.GuardarNuevosServicios();
+                integracionPAMIManager.GuardarNuevosServiciosDesdeGoing();
+            }
 			catch (Exception ex)
 			{
 				_logger.Error(ex, ex.Message);

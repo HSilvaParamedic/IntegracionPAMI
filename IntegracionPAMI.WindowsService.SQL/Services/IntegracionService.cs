@@ -35,20 +35,21 @@ namespace IntegracionPAMI.WindowsService.SQL.Services
                     preInc.NroServicio = serviceDto.Id;
                     preInc.Domicilio.dmCalle = serviceDto.Address.StreetName + ' ' + serviceDto.Address.HouseNumber + ' ' + serviceDto.Address.FloorApt;
                     preInc.Domicilio.dmEntreCalle1 = serviceDto.Address.BetweenStreet1;
-                    preInc.Domicilio.dmEntreCalle2 = serviceDto.Address.BetweenSteet2;
+                    preInc.Domicilio.dmEntreCalle2 = serviceDto.Address.BetweenStreet2;
                     preInc.errLocalidad = serviceDto.Address.City;
 
                     preInc.NroAfiliado = serviceDto.BeneficiaryID;
                     preInc.Paciente = serviceDto.BeneficiaryName;
-                    preInc.Sexo = serviceDto.Gender;
+                    if (serviceDto.Gender.Length > 1) { preInc.Sexo = serviceDto.Gender.Substring(0, 1); }
                     preInc.Edad = Convert.ToDecimal( MapEdad(serviceDto.Age, serviceDto.AgeUnit));
                     preInc.Sintomas = serviceDto.Triage.Last().Reason;
-                    preInc.errGradoOperativo = serviceDto.Clasification;
+                    if (preInc.Sintomas.Length > 100) { preInc.Sintomas = preInc.Sintomas.Substring(0, 100); }
+                    preInc.errGradoOperativo = serviceDto.Classification;
 
                     //// Busco equivalencias
 
                     long cnfId = objConfigEquivalencias.GetIDByClienteId(Convert.ToInt64(preInc.ClienteId.GetObjectId()));
-                    preInc.GradoOperativoId.SetObjectId(getGradoOperativoId(cnfId, MapGrado(serviceDto.Clasification)).ToString());
+                    preInc.GradoOperativoId.SetObjectId(getGradoOperativoId(cnfId, MapGrado(serviceDto.Classification)).ToString());
                     preInc.LocalidadId.SetObjectId(getLocalidadId(cnfId, serviceDto.Address.City).ToString());
                     
                     preInc.MetodoIngresoId = modDeclares.preIncidenteOrigen.RestServicePAMI;
@@ -85,7 +86,8 @@ namespace IntegracionPAMI.WindowsService.SQL.Services
             {
 
                 conConfiguracionesRegionalesReglas objEquivalencias = new conConfiguracionesRegionalesReglas();
-                gdo = Convert.ToInt64(objEquivalencias.GetValor1(cnfId, grado, 103));
+                string eqVal = objEquivalencias.GetValor1(cnfId, grado, 103);
+                if (eqVal != "") { gdo = Convert.ToInt64(eqVal); }
 
             }
 
@@ -132,6 +134,13 @@ namespace IntegracionPAMI.WindowsService.SQL.Services
                     if (loc == 0)
                     {
                         loc = objLocalidades.GetIDByDescripcion(localidad);
+                    }
+
+                    if (loc == 0)
+                    {
+                        conLocalidadesSinonimos objSinonimo = new conLocalidadesSinonimos();
+                        loc = objSinonimo.GetLocalidadIdBySinonimo(localidad);
+                        objSinonimo = null;
                     }
 
                 }
@@ -256,7 +265,7 @@ namespace IntegracionPAMI.WindowsService.SQL.Services
         {
             if (modDatabase.cnnsNET.Count > 0)
             {
-                if (modDatabase.cnnsNET[modDeclares.cnnDefault].State <> ConnectionState.Open)
+                if (modDatabase.cnnsNET[modDeclares.cnnDefault].State != ConnectionState.Open)
                 {
                     modDatabase.cnnsNET.Remove(modDeclares.cnnDefault);
                 }
@@ -320,13 +329,13 @@ namespace IntegracionPAMI.WindowsService.SQL.Services
                 case "Oficio Clinico":
                     return "R";
                 default:
-                    throw new Exception("No se reconoce el grado");
+                    return "R";
             }
         }
 
         private string MapEdad(int age, string ageUnit)
         {
-            switch (ageUnit)
+            switch (ageUnit.ToLower())
             {
                 case "años":
                     return age.ToString();

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace IntegracionPAMI.APIConsumer.Dto
 {
-public	class OngoingSerivcesList
+public	class OngoingServicesListDto
 	{
-		public OngoingSerivce[] SummaryMyProperty { get; set; }
+		public OngoingServiceDto[] Summary { get; set; }
 		public DateTime TimeRequested { get; set; }
 		public bool IsSeccess { get; set; }
 		public string Message { get; set; }
