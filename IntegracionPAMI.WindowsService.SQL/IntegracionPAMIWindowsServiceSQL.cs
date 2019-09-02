@@ -59,7 +59,7 @@ namespace IntegracionPAMI.WindowsService.SQL
             try
             {
                 _integracionPAMIManager.GuardarNuevosServicios();
-                _integracionPAMIManager.EnviarEstadosAsignacion();
+                ///_integracionPAMIManager.EnviarEstadosAsignacion();
             }
             catch (Exception ex)
             {

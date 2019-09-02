@@ -69,8 +69,8 @@ namespace IntegracionPAMI.Test.Services
 			try
 			{
 				IntegracionPAMIManager integracionPAMIManager = new IntegracionPAMIManager(new IntegracionService());
-                //integracionPAMIManager.GuardarNuevosServicios();
-                integracionPAMIManager.GuardarNuevosServiciosDesdeGoing();
+                integracionPAMIManager.GuardarNuevosServicios();
+                //integracionPAMIManager.GuardarNuevosServiciosDesdeGoing();
             }
 			catch (Exception ex)
 			{
