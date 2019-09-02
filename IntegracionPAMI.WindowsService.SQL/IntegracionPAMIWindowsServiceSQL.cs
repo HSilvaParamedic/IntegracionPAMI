@@ -12,7 +12,6 @@ namespace IntegracionPAMI.WindowsService.SQL
     public partial class IntegracionPAMIWindowsServiceSQL : ServiceBase
     {
         private static Logger _logger = LogManager.GetCurrentClassLogger();
-        private int eventId = 1;
         private Timer timer;
         private readonly IntegracionPAMIManager _integracionPAMIManager;
 
@@ -27,7 +26,7 @@ namespace IntegracionPAMI.WindowsService.SQL
             catch (Exception ex)
             {
                 _logger.Error(ex, ex.Message);
-                throw ex;
+                throw;
             }
         }
 
@@ -45,7 +44,7 @@ namespace IntegracionPAMI.WindowsService.SQL
             catch (Exception ex)
             {
                 _logger.Error(ex, ex.Message);
-                throw ex;
+                throw;
             }
         }
 
@@ -58,10 +57,13 @@ namespace IntegracionPAMI.WindowsService.SQL
         {
             try
             {
-                _integracionPAMIManager.GuardarNuevosServicios();
-                ///_integracionPAMIManager.EnviarEstadosAsignacion();
-            }
-            catch (Exception ex)
+				_logger.Info("Ejecutando guardado de nuevos servicios...");
+				_integracionPAMIManager.GuardarNuevosServicios();
+				_logger.Info("Finalización de guardado de nuevos servicios...");
+
+				///_integracionPAMIManager.EnviarEstadosAsignacion();
+			}
+			catch (Exception ex)
             {
                 _logger.Error(ex, ex.Message);
             }
