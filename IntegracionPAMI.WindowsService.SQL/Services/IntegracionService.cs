@@ -24,6 +24,9 @@ namespace IntegracionPAMI.WindowsService.SQL.Services
                 if (this.SQLConnect())
                 {
 
+                    modFechas.InitDateVars();
+                    modNumeros.InitSepDecimal();
+
                     conConfiguracionesRegionales objConfigEquivalencias = new conConfiguracionesRegionales();
 
                     conPreIncidentes preInc = new conPreIncidentes();
@@ -54,6 +57,7 @@ namespace IntegracionPAMI.WindowsService.SQL.Services
                     
                     preInc.MetodoIngresoId = modDeclares.preIncidenteOrigen.RestServicePAMI;
                     preInc.Observaciones = serviceDto.OriginComments;
+
 
                     preInc.FecHorServicio = serviceDto.TimeRequested;
 
