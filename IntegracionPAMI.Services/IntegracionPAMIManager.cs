@@ -36,12 +36,12 @@ namespace IntegracionPAMI.Services
 				_logger.Info($"Obteniendo servicio ID {notification.ServiceID} desde la API...");
 				ServiceDto service =  servicioServices.GetServicio(notification.ServiceID);
 
-				_logger.Info("Almacenando servicio ID {notification.ServiceID} en BD...");
+				_logger.Info("$Almacenando servicio ID {notification.ServiceID} en BD...");
 				bool isSuccess = _integracionServices.AlmacenarEnBaseDedatos(service);
 
 				if (isSuccess)
 				{
-					_logger.Info("Reconociendo notifiación de servicio ID {notification.ServiceID} en la API...");
+					_logger.Info("$Reconociendo notifiación de servicio ID {notification.ServiceID} en la API...");
 					servicioServices.ReconocerNotification(notification.ServiceID, notification.Order);
 				}
 				else

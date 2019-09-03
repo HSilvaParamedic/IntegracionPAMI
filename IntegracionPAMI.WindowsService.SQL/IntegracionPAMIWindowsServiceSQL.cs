@@ -1,171 +1,150 @@
 ﻿using System;
+using System.IO;
 using System.Timers;
-using System.Diagnostics;
 using System.Configuration;
 using System.ServiceProcess;
+using System.Security.Principal;
+using System.Security.AccessControl;
 using IntegracionPAMI.Services;
 using IntegracionPAMI.WindowsService.SQL.Services;
 using NLog;
 
-using System.IO;
-using System.Security.AccessControl;
-using System.Security.Principal;
 
 namespace IntegracionPAMI.WindowsService.SQL
 {
-    public partial class IntegracionPAMIWindowsServiceSQL : ServiceBase
-    {
-        private static Logger _logger = LogManager.GetCurrentClassLogger();
-        ///private int eventId = 1;
-        private Timer timer;
-        private readonly IntegracionPAMIManager _integracionPAMIManager;
+	public partial class IntegracionPAMIWindowsServiceSQL : ServiceBase
+	{
+		private static Logger _logger = LogManager.GetCurrentClassLogger();
+		private Timer timer;
+		private readonly IntegracionPAMIManager _integracionPAMIManager;
 
-        public IntegracionPAMIWindowsServiceSQL()
-        {
-            InitializeComponent();
+		public IntegracionPAMIWindowsServiceSQL()
+		{
+			InitializeComponent();
 
-            try
-            {
-                _integracionPAMIManager = new IntegracionPAMIManager(new IntegracionService());
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, ex.Message);
-                throw ex;
-            }
-        }
+			try
+			{
+				_integracionPAMIManager = new IntegracionPAMIManager(new IntegracionService());
+			}
+			catch (Exception ex)
+			{
+				_logger.Error(ex, ex.Message);
+				throw ex;
+			}
+		}
 
-        protected override void OnStart(string[] args)
-        {
-            try
-            {
+		protected override void OnStart(string[] args)
+		{
+			try
+			{
 
-                ElapsedHandler();
+				ElapsedHandler();
 
-                timer = new Timer();
-                timer.Elapsed += delegate { ElapsedHandler(); };
-                timer.Interval = int.Parse(ConfigurationManager.AppSettings.Get("IntervaloDeEjecucion_Mins")) * 10000;
-                timer.Elapsed += new ElapsedEventHandler(this.OnTimer);
-                timer.Start();
+				timer = new Timer();
+				timer.Interval = int.Parse(ConfigurationManager.AppSettings.Get("IntervaloDeEjecucion_Mins")) * 10000;
+				timer.Elapsed += new ElapsedEventHandler(this.OnTimer);
+				timer.Start();
 
-                _logger.Info("Se inició el servicio");
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, ex.Message);
-                throw ex;
-            }
-        }
+				_logger.Info("Se inició el servicio");
+			}
+			catch (Exception ex)
+			{
+				_logger.Error(ex, ex.Message);
+				throw ex;
+			}
+		}
 
-         //protected override void OnStart(string[] args)
-        //{
-        //    try
-        //    {
+		protected override void OnStop()
+		{
+			_logger.Info("Se detuvo el servicio");
+		}
 
-        //        timer = new Timer();
-        //        timer.Interval = int.Parse(ConfigurationManager.AppSettings.Get("IntervaloDeEjecucion_Mins")) * 10000;
-        //        timer.Elapsed += new ElapsedEventHandler(this.OnTimer);
-        //        timer.Start();
+		private void OnTimer(object sender, ElapsedEventArgs args)
+		{
+			try
+			{
+				ElapsedHandler();
+			}
+			catch (Exception ex)
+			{
+				_logger.Error(ex, ex.Message);
+			}
+		}
 
-        //        _logger.Info("Se inició el servicio");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.Error(ex, ex.Message);
-        //        throw ex;
-        //    }
-        //}
+		private void ElapsedHandler()
+		{
+			try
+			{
+				_logger.Info("Ejecutando guardado de nuevos servicios...");
+				_integracionPAMIManager.GuardarNuevosServicios();
+				_logger.Info("Finalización de guardado de nuevos servicios...");
+				///_integracionPAMIManager.EnviarEstadosAsignacion();
+			}
+			catch (Exception ex)
+			{
+				_logger.Error(ex, ex.Message);
+			}
+		}
 
-        protected override void OnStop()
-        {
-            _logger.Info("Se detuvo el servicio");
-        }
+		#region Public Methods
 
-        private void OnTimer(object sender, ElapsedEventArgs args)
-        {
-            try
-            {
-                _integracionPAMIManager.GuardarNuevosServicios();
-                ///_integracionPAMIManager.EnviarEstadosAsignacion();
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, ex.Message);
-            }
-        }
+		/// <summary>
+		/// Para ejecutarlo por consola, para testear.
+		/// </summary>
+		/// <param name="args"></param>
+		public void RunAsConsole(string[] args)
+		{
+			OnStart(args);
+			Console.WriteLine("Presione cualquier tecla para salir...");
+			Console.ReadLine();
+			OnStop();
+		}
 
-        private void ElapsedHandler()
-        {
-            try
-            {
-                _integracionPAMIManager.GuardarNuevosServicios();
-                ///_integracionPAMIManager.EnviarEstadosAsignacion();
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, ex.Message);
-            }
-        }
+		public void SetFullControlPermissionsToEveryone(string path)
+		{
+			const FileSystemRights rights = FileSystemRights.FullControl;
 
-        #region Public Methods
+			var allUsers = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
 
-        /// <summary>
-        /// Para ejecutarlo por consola, para testear.
-        /// </summary>
-        /// <param name="args"></param>
-        public void RunAsConsole(string[] args)
-        {
-            OnStart(args);
-            Console.WriteLine("Presione cualquier tecla para salir...");
-            Console.ReadLine();
-            OnStop();
-        }
+			// Add Access Rule to the actual directory itself
+			var accessRule = new FileSystemAccessRule(
+				allUsers,
+				rights,
+				InheritanceFlags.None,
+				PropagationFlags.NoPropagateInherit,
+				AccessControlType.Allow);
 
-        public void SetFullControlPermissionsToEveryone(string path)
-        {
-            const FileSystemRights rights = FileSystemRights.FullControl;
+			var info = new DirectoryInfo(path);
+			var security = info.GetAccessControl(AccessControlSections.Access);
 
-            var allUsers = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
+			bool result;
+			security.ModifyAccessRule(AccessControlModification.Set, accessRule, out result);
 
-            // Add Access Rule to the actual directory itself
-            var accessRule = new FileSystemAccessRule(
-                allUsers,
-                rights,
-                InheritanceFlags.None,
-                PropagationFlags.NoPropagateInherit,
-                AccessControlType.Allow);
+			if (!result)
+			{
+				throw new InvalidOperationException("Failed to give full-control permission to all users for path " + path);
+			}
 
-            var info = new DirectoryInfo(path);
-            var security = info.GetAccessControl(AccessControlSections.Access);
+			// add inheritance
+			var inheritedAccessRule = new FileSystemAccessRule(
+				allUsers,
+				rights,
+				InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+				PropagationFlags.InheritOnly,
+				AccessControlType.Allow);
 
-            bool result;
-            security.ModifyAccessRule(AccessControlModification.Set, accessRule, out result);
+			bool inheritedResult;
+			security.ModifyAccessRule(AccessControlModification.Add, inheritedAccessRule, out inheritedResult);
 
-            if (!result)
-            {
-                throw new InvalidOperationException("Failed to give full-control permission to all users for path " + path);
-            }
+			if (!inheritedResult)
+			{
+				throw new InvalidOperationException("Failed to give full-control permission inheritance to all users for " + path);
+			}
 
-            // add inheritance
-            var inheritedAccessRule = new FileSystemAccessRule(
-                allUsers,
-                rights,
-                InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
-                PropagationFlags.InheritOnly,
-                AccessControlType.Allow);
+			info.SetAccessControl(security);
+		}
 
-            bool inheritedResult;
-            security.ModifyAccessRule(AccessControlModification.Add, inheritedAccessRule, out inheritedResult);
+		#endregion
 
-            if (!inheritedResult)
-            {
-                throw new InvalidOperationException("Failed to give full-control permission inheritance to all users for " + path);
-            }
-
-            info.SetAccessControl(security);
-        }
-
-        #endregion
-
-    }
+	}
 }

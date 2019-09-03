@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IntegracionPAMI.WindowsService.SQL
 {
@@ -25,16 +21,6 @@ namespace IntegracionPAMI.WindowsService.SQL
                 service.SetFullControlPermissionsToEveryone(AppDomain.CurrentDomain.BaseDirectory);
                 ServiceBase.Run(service);
             }
-
-            //static void Main()
-            //{
-            //    ServiceBase[] ServicesToRun;
-            //    ServicesToRun = new ServiceBase[]
-            //    {
-            //        new IntegracionPAMIWindowsServiceSQL()
-            //    };
-            //    ServiceBase.Run(ServicesToRun);
-            //}
         }
 	}
 }

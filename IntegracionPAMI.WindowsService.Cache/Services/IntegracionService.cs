@@ -31,7 +31,7 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 					    0,
 					    "",
 					    serviceDto.Address.BetweenStreet1,
-					    serviceDto.Address.BetweenSteet2,
+					    serviceDto.Address.BetweenStreet2,
 					    "",
 					    serviceDto.BeneficiaryName,
 					    serviceDto.Gender,
