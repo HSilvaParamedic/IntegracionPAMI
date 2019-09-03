@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using IntegracionPAMI.APIConsumer.Dto;
 using IntegracionPAMI.APIConsumer.Helpers;
 using System.Data;
+using NLog;
 
 namespace IntegracionPAMI.Services
 {
 	public class IntegracionPAMIManager
 	{
+		private static Logger _logger = LogManager.GetCurrentClassLogger();
 		private readonly IIntegracionServices _integracionServices;
 
 		public IntegracionPAMIManager(IIntegracionServices servicioServices)
@@ -21,26 +23,36 @@ namespace IntegracionPAMI.Services
 
 		public  void GuardarNuevosServicios()
 		{
-			IEnumerable<NotificationDto> notificacions = servicioServices.GetNuevasNotifications();
+			_logger.Info("Obteniendo nuevas notificaciones desde la API...");
 
-			foreach (NotificationDto notification in notificacions.Where(n=>n.NotificationType ==  "Nuevo"))
+			IEnumerable<NotificationDto> notificaciones = servicioServices.GetNuevasNotifications();
+			_logger.Info($"Notificaciones obtenidas {notificaciones.Count()}");
+
+			notificaciones = notificaciones.Where(n => n.NotificationType == "Nuevo");
+			_logger.Info($"Notificaciones nuevas obtenidas {notificaciones.Count()}");
+
+			foreach (NotificationDto notification in notificaciones)
 			{
+				_logger.Info($"Obteniendo servicio ID {notification.ServiceID} desde la API...");
 				ServiceDto service =  servicioServices.GetServicio(notification.ServiceID);
 
+				_logger.Info("Almacenando servicio ID {notification.ServiceID} en BD...");
 				bool isSuccess = _integracionServices.AlmacenarEnBaseDedatos(service);
 
 				if (isSuccess)
 				{
-					 servicioServices.ReconocerNotification(notification.ServiceID, notification.Order);
+					_logger.Info("Reconociendo notifiación de servicio ID {notification.ServiceID} en la API...");
+					servicioServices.ReconocerNotification(notification.ServiceID, notification.Order);
 				}
 				else
 				{
 					throw new Exception("Hubo un inconveniente al almacenar el servicio en la BD");
 				}
 			}
+			_logger.Info($"Notifiaciones guardadas, total {notificaciones.Count()}");
 		}
 
-        public void GuardarNuevosServiciosDesdeGoing()
+		public void GuardarNuevosServiciosDesdeGoing()
         {
             IEnumerable<OngoingServiceDto> notificacions = servicioServices.GetServiciosEnCurso();
 
