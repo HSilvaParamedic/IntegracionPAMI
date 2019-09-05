@@ -29,7 +29,7 @@ namespace IntegracionPAMI.WindowsService.SQL
 			catch (Exception ex)
 			{
 				_logger.Error(ex, ex.Message);
-				throw ex;
+				throw;
 			}
 		}
 
@@ -50,7 +50,7 @@ namespace IntegracionPAMI.WindowsService.SQL
 			catch (Exception ex)
 			{
 				_logger.Error(ex, ex.Message);
-				throw ex;
+				throw;
 			}
 		}
 

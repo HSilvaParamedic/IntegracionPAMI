@@ -34,7 +34,7 @@ namespace IntegracionPAMI.Services
 			foreach (NotificationDto notification in notificaciones)
 			{
 				_logger.Info($"Obteniendo servicio ID {notification.ServiceID} desde la API...");
-				ServiceDto service =  servicioServices.GetServicio(notification.ServiceID);
+				ServiceDto service = servicioServices.GetServicio(notification.ServiceID);				
 
 				_logger.Info("$Almacenando servicio ID {notification.ServiceID} en BD...");
 				bool isSuccess = _integracionServices.AlmacenarEnBaseDedatos(service);

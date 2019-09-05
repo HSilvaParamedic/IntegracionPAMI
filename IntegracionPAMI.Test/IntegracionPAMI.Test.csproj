@@ -88,7 +88,7 @@
       <Name>IntegracionPAMI.APIConsumer</Name>
     </ProjectReference>
     <ProjectReference Include="..\IntegracionPAMI.Services\IntegracionPAMI.Services.csproj">
-      <Project>{3360F087-3274-4BE9-BA1A-073D110C3974}</Project>
+      <Project>{3360f087-3274-4be9-ba1a-073d110c3974}</Project>
       <Name>IntegracionPAMI.Services</Name>
     </ProjectReference>
     <ProjectReference Include="..\IntegracionPAMI.WindowsService.SQL\IntegracionPAMI.WindowsService.SQL.csproj">

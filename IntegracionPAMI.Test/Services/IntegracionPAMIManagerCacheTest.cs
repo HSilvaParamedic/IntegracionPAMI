@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Configuration;
 using IntegracionPAMI.Services;
-using IntegracionPAMI.WindowsService.Cache.Services;
+//using IntegracionPAMI.WindowsService.Cache.Services;
 using NLog;
 
 namespace IntegracionPAMI.Test.Services
@@ -68,9 +68,9 @@ namespace IntegracionPAMI.Test.Services
 			Logger _logger = LogManager.GetCurrentClassLogger();
 			try
 			{
-				IntegracionPAMIManager integracionPAMIManager = new IntegracionPAMIManager(new IntegracionService());
+				//IntegracionPAMIManager integracionPAMIManager = new IntegracionPAMIManager(new IntegracionService());
                 //integracionPAMIManager.GuardarNuevosServicios();
-                integracionPAMIManager.GuardarNuevosServiciosDesdeGoing();
+                //integracionPAMIManager.GuardarNuevosServiciosDesdeGoing();
             }
 			catch (Exception ex)
 			{
@@ -86,8 +86,8 @@ namespace IntegracionPAMI.Test.Services
 			Logger _logger = LogManager.GetCurrentClassLogger();
 			try
 			{
-				IntegracionPAMIManager integracionPAMIManager = new IntegracionPAMIManager(new IntegracionService());
-				integracionPAMIManager.EnviarEstadosAsignacion();
+				//IntegracionPAMIManager integracionPAMIManager = new IntegracionPAMIManager(new IntegracionService());
+				//integracionPAMIManager.EnviarEstadosAsignacion();
 			}
 			catch (Exception ex)
 			{

@@ -11,7 +11,7 @@
 		public string BeneficiaryID { get; set; }
 		public string BeneficiaryName { get; set; }
 		public string Gender { get; set; }
-		public int Age { get; set; }
+		public int? Age { get; set; }
 		public string AgeUnit { get; set; }
 		public string OriginComments { get; set; }
 		public string AssignmentComments { get; set; }

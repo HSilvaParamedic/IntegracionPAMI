@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Text;
-using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Configuration;
-using IntegracionPAMI.Services;
 using IntegracionPAMI.WindowsService.SQL.Services;
 using NLog;
+using IntegracionPAMI.Services;
 
 namespace IntegracionPAMI.Test.Services
 {
@@ -68,7 +65,7 @@ namespace IntegracionPAMI.Test.Services
 			Logger _logger = LogManager.GetCurrentClassLogger();
 			try
 			{
-				IntegracionPAMIManager integracionPAMIManager = new IntegracionPAMIManager(new IntegracionService());
+				   IntegracionPAMIManager integracionPAMIManager = new IntegracionPAMIManager(new IntegracionService());
                 integracionPAMIManager.GuardarNuevosServicios();
                 //integracionPAMIManager.GuardarNuevosServiciosDesdeGoing();
             }

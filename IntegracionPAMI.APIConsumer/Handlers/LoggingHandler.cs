@@ -53,7 +53,7 @@ namespace IntegracionPAMI.APIConsumer.Handlers
 			catch (Exception ex)
 			{
 				_logger.Error(ex, "Failed to get response");
-				throw ex;
+				throw;
 			}
 		}
 	}
