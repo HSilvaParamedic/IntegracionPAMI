@@ -20,33 +20,33 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 			try
 			{
 
-                ConnectionStringCache connectionStringCache = GetConnectionStringCache();
+				ConnectionStringCache connectionStringCache = GetConnectionStringCache();
 
-                DevSetServicio vRdo = new GalenoServicios(connectionStringCache).SetServicio(
-					    cliCod,
-					    nroAut,
-					    serviceDto.Id,
-					    $"{serviceDto.Address.StreetName} {serviceDto.Address.FloorApt}",
-					    int.Parse(serviceDto.Address.HouseNumber),
-					    0,
-					    "",
-					    serviceDto.Address.BetweenStreet1,
-					    serviceDto.Address.BetweenStreet2,
-					    "",
-					    serviceDto.BeneficiaryName,
-					    serviceDto.Gender,
-					    MapEdad(serviceDto.Age, serviceDto.AgeUnit),
-					    serviceDto.Triage.Last().Reason,
-					    "",
-					    serviceDto.Address.City,
-					    serviceDto.BeneficiaryID,
-					    new DateTime(serviceDto.TimeRequested.Year, serviceDto.TimeRequested.Month, serviceDto.TimeRequested.Day),
-					    $"{serviceDto.TimeRequested.Hour}:{serviceDto.TimeRequested.Minute}",
-					    0,
-					    "",
-					    MapGrado(serviceDto.Classification),
-					    "",
-					    serviceDto.OriginComments
+				DevSetServicio vRdo = new GalenoServicios(connectionStringCache).SetServicio(
+						cliCod,
+						nroAut,
+						serviceDto.Id,
+						$"{serviceDto.Address.StreetName} {serviceDto.Address.FloorApt}",
+						int.Parse(serviceDto.Address.HouseNumber),
+						0,
+						"",
+						serviceDto.Address.BetweenStreet1,
+						serviceDto.Address.BetweenStreet2,
+						"",
+						serviceDto.BeneficiaryName,
+						serviceDto.Gender,
+						serviceDto.Age.HasValue ? MapEdad(serviceDto.Age.Value, serviceDto.AgeUnit) : "",
+						serviceDto.Triage.Last().Reason,
+						"",
+						serviceDto.Address.City,
+						serviceDto.BeneficiaryID,
+						new DateTime(serviceDto.TimeRequested.Year, serviceDto.TimeRequested.Month, serviceDto.TimeRequested.Day),
+						$"{serviceDto.TimeRequested.Hour}:{serviceDto.TimeRequested.Minute}",
+						0,
+						"",
+						MapGrado(serviceDto.Classification),
+						"",
+						serviceDto.OriginComments
 				);
 
 				return vRdo.Resultado;
@@ -60,26 +60,26 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 
 		public DataTable GetEstadosAsignacion()
 		{
-            ConnectionStringCache connectionStringCache = GetConnectionStringCache();
-            DataTable dt = new GalenoServicios(connectionStringCache).GetPamiEstadosAsignacionPendientes(cliCod);
-            for (int i = 0; i < dt.Rows.Count -1; i++)
-            {
-                if ((int.Parse(dt.Rows[i]["EventoId"].ToString()) == 4) && (int.Parse(dt.Rows[i]["EstadoCierre"].ToString()) == 1))
-                {
-                    dt.Rows[i]["GradoOperativoId"] = this.MapGradoToRest(dt.Rows[i]["GradoOperativoId"].ToString());
-                }
-            }
-            return dt;
+			ConnectionStringCache connectionStringCache = GetConnectionStringCache();
+			DataTable dt = new GalenoServicios(connectionStringCache).GetPamiEstadosAsignacionPendientes(cliCod);
+			for (int i = 0; i < dt.Rows.Count - 1; i++)
+			{
+				if ((int.Parse(dt.Rows[i]["EventoId"].ToString()) == 4) && (int.Parse(dt.Rows[i]["EstadoCierre"].ToString()) == 1))
+				{
+					dt.Rows[i]["GradoOperativoId"] = this.MapGradoToRest(dt.Rows[i]["GradoOperativoId"].ToString());
+				}
+			}
+			return dt;
 		}
 
-        public bool SetEstadoAsignacionEnviado(decimal pGalenoId, int pEventoId)
-        {
-            ConnectionStringCache connectionStringCache = GetConnectionStringCache();
-            return new GalenoServicios(connectionStringCache).SetPamiEventoEnviado(pGalenoId, pEventoId);
-        }
+		public bool SetEstadoAsignacionEnviado(decimal pGalenoId, int pEventoId)
+		{
+			ConnectionStringCache connectionStringCache = GetConnectionStringCache();
+			return new GalenoServicios(connectionStringCache).SetPamiEventoEnviado(pGalenoId, pEventoId);
+		}
 
 
-        private ConnectionStringCache GetConnectionStringCache()
+		private ConnectionStringCache GetConnectionStringCache()
 		{
 			string[] connectionStringCacheValues = ConfigurationManager.AppSettings.Get("ConnectionStringCache_Values").Split('|');
 			return new ConnectionStringCache
@@ -136,22 +136,22 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 			}
 		}
 
-        private string MapGradoToRest(string grade)
-        {
-            switch (grade.Trim())
-            {
-                case "V":
-                    return "Verde";
-                case "A":
-                    return "Amarillo";
-                case "R":
-                    return "Rojo";
-                default:
-                    return "";
-            }
-        }
+		private string MapGradoToRest(string grade)
+		{
+			switch (grade.Trim())
+			{
+				case "V":
+					return "Verde";
+				case "A":
+					return "Amarillo";
+				case "R":
+					return "Rojo";
+				default:
+					return "";
+			}
+		}
 
-        private string MapEdad(int age, string ageUnit)
+		private string MapEdad(int age, string ageUnit)
 		{
 			switch (ageUnit.ToLower())
 			{
@@ -166,5 +166,5 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 			}
 		}
 
-    }
+	}
 }
