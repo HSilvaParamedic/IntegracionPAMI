@@ -9,7 +9,8 @@
 		public AddressDto Address { get; set; }
 		public string CustomerName { get; set; }
 		public string BeneficiaryID { get; set; }
-		public string BeneficiaryName { get; set; }
+        public string phoneNumber { get; set; }
+        public string BeneficiaryName { get; set; }
 		public string Gender { get; set; }
 		public int? Age { get; set; }
 		public string AgeUnit { get; set; }

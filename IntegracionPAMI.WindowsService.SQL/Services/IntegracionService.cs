@@ -34,19 +34,25 @@ namespace IntegracionPAMI.WindowsService.SQL.Services
 
 					preInc.CleanProperties(preInc);
 
-					preInc.ClienteId.SetObjectId(objCliente.GetIDByAbreviaturaId(cliCod).ToString());
+                    preInc.Telefono = serviceDto.phoneNumber;
+                    preInc.ClienteId.SetObjectId(objCliente.GetIDByAbreviaturaId(cliCod).ToString());
 					preInc.NroServicio = serviceDto.Id;
 					preInc.Domicilio.dmCalle = serviceDto.Address.StreetName + ' ' + serviceDto.Address.HouseNumber + ' ' + serviceDto.Address.FloorApt;
-					preInc.Domicilio.dmEntreCalle1 = serviceDto.Address.BetweenStreet1;
+                    preInc.Domicilio.dmEntreCalle1 = serviceDto.Address.BetweenStreet1;
 					preInc.Domicilio.dmEntreCalle2 = serviceDto.Address.BetweenStreet2;
-					preInc.errLocalidad = serviceDto.Address.City;
+
+                    preInc.Domicilio.dmLatitud = serviceDto.Address.LatLng.Latitude;
+                    preInc.Domicilio.dmLongitud = serviceDto.Address.LatLng.Longitude;
+
+                    preInc.errLocalidad = serviceDto.Address.City;
 
 					preInc.NroAfiliado = serviceDto.BeneficiaryID;
 					preInc.Paciente = serviceDto.BeneficiaryName;
 					if (serviceDto.Gender.Length > 1) { preInc.Sexo = serviceDto.Gender.Substring(0, 1); }
 					preInc.Edad = serviceDto.Age.HasValue ? Convert.ToDecimal(MapEdad(serviceDto.Age.Value, serviceDto.AgeUnit)) : 0;
 					preInc.Sintomas = serviceDto.Triage.Last().Reason;
-					if (preInc.Sintomas.Length > 100) { preInc.Sintomas = preInc.Sintomas.Substring(0, 100); }
+
+                    if (preInc.Sintomas.Length > 100) { preInc.Sintomas = preInc.Sintomas.Substring(0, 100); }
 					preInc.errGradoOperativo = serviceDto.Classification;
 
 					//// Busco equivalencias
@@ -56,10 +62,30 @@ namespace IntegracionPAMI.WindowsService.SQL.Services
 					preInc.LocalidadId.SetObjectId(getLocalidadId(cnfId, serviceDto.Address.City).ToString());
 
 					preInc.MetodoIngresoId = modDeclares.preIncidenteOrigen.RestServicePAMI;
-					preInc.Observaciones = serviceDto.OriginComments;
 
+                    //// Observaciones
+                    preInc.Observaciones = serviceDto.OriginComments;
 
-					preInc.FecHorServicio = serviceDto.TimeRequested;
+                    AttributeDto atr = serviceDto.Attributes.SingleOrDefault(a => a.Name == "Tratamiento preferencial");
+                    if (atr != null && atr.Value.Length > 2)
+                    {
+                        preInc.Observaciones = preInc.Observaciones + " - Tratamiento Preferencial: " + atr.Value;
+                    }
+
+                    atr = serviceDto.Attributes.SingleOrDefault(a => a.Name == "Módulo de internación");
+                    if (atr != null && atr.Value.Length > 2)
+                    {
+                        preInc.Observaciones = preInc.Observaciones + " Módulo de internación: " + atr.Value;
+                    }
+
+                    //// Documento
+                    atr = serviceDto.Attributes.SingleOrDefault(a => a.Name == "Número de documento");
+                    if (atr != null)
+                    {
+                        preInc.NroDocumento = atr.Value;
+                    }
+
+                    preInc.FecHorServicio = serviceDto.TimeRequested;
 
 					bool savOk = preInc.Salvar(preInc);
 
@@ -79,7 +105,6 @@ namespace IntegracionPAMI.WindowsService.SQL.Services
 			return false;
 
 		}
-
 
 		private long getGradoOperativoId(long cnfId, string grado)
 		{

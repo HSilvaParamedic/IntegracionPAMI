@@ -22,14 +22,29 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 
 				ConnectionStringCache connectionStringCache = GetConnectionStringCache();
 
-				DevSetServicio vRdo = new GalenoServicios(connectionStringCache).SetServicio(
+                /// Observaciones
+                string sObs = serviceDto.OriginComments;
+
+                AttributeDto atr = serviceDto.Attributes.SingleOrDefault(a => a.Name == "Tratamiento preferencial");
+                if (atr != null && atr.Value.Length > 2)
+                {
+                    sObs = sObs + " - Tratamiento Preferencial: " + atr.Value;
+                }
+
+                atr = serviceDto.Attributes.SingleOrDefault(a => a.Name == "Módulo de internación");
+                if (atr != null && atr.Value.Length > 2)
+                {
+                    sObs = sObs + " Módulo de internación: " + atr.Value;
+                }
+
+                DevSetServicio vRdo = new GalenoServicios(connectionStringCache).SetServicio(
 						cliCod,
 						nroAut,
 						serviceDto.Id,
-						$"{serviceDto.Address.StreetName} {serviceDto.Address.FloorApt}",
+						serviceDto.Address.StreetName,
 						int.Parse(serviceDto.Address.HouseNumber),
 						0,
-						"",
+                        serviceDto.Address.FloorApt,
 						serviceDto.Address.BetweenStreet1,
 						serviceDto.Address.BetweenStreet2,
 						"",
@@ -37,7 +52,7 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 						serviceDto.Gender,
 						serviceDto.Age.HasValue ? MapEdad(serviceDto.Age.Value, serviceDto.AgeUnit) : "",
 						serviceDto.Triage.Last().Reason,
-						"",
+						serviceDto.phoneNumber,
 						serviceDto.Address.City,
 						serviceDto.BeneficiaryID,
 						new DateTime(serviceDto.TimeRequested.Year, serviceDto.TimeRequested.Month, serviceDto.TimeRequested.Day),
@@ -46,8 +61,10 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 						"",
 						MapGrado(serviceDto.Classification),
 						"",
-						serviceDto.OriginComments
-				);
+                        sObs,
+                        serviceDto.Address.LatLng.Latitude,
+                        serviceDto.Address.LatLng.Longitude
+                );
 
                 if (vRdo != null)
                 {
