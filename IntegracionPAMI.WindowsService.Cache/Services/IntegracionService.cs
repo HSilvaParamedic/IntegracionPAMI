@@ -49,16 +49,20 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 						serviceDto.OriginComments
 				);
 
-				return vRdo.Resultado;
+                if (vRdo != null)
+                {
+                    return vRdo.Resultado;
+                }
+				
 			}
 			catch (Exception ex)
 			{
 				_logger.Error(ex, ex.Message);
-				return false;
 			}
-		}
+            return false;
+        }
 
-		public DataTable GetEstadosAsignacion()
+        public DataTable GetEstadosAsignacion()
 		{
 			ConnectionStringCache connectionStringCache = GetConnectionStringCache();
 			DataTable dt = new GalenoServicios(connectionStringCache).GetPamiEstadosAsignacionPendientes(cliCod);
