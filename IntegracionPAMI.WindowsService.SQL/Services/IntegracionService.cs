@@ -20,6 +20,7 @@ namespace IntegracionPAMI.WindowsService.SQL.Services
 		{
 			try
 			{
+				_logger.Info($"Almacenando servicio (ID {serviceDto.Id}) en BD...");
 
 				if (this.SQLConnect())
 				{
@@ -96,11 +97,12 @@ namespace IntegracionPAMI.WindowsService.SQL.Services
 					return savOk;
 
 				}
-
+				_logger.Info($"Finalización de almacenamiento de servicio (ID {serviceDto.Id}) en BD.");
 			}
 			catch (Exception ex)
 			{
 				_logger.Error(ex, ex.Message);
+				_logger.Info($"Finalización CON ERRORES de almacenamiento de servicio (ID {serviceDto.Id}) en BD.");
 			}
 			return false;
 

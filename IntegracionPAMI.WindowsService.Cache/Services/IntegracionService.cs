@@ -19,32 +19,33 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 		{
 			try
 			{
+				_logger.Info($"Almacenando servicio (ID {serviceDto.Id}) en BD...");
 
 				ConnectionStringCache connectionStringCache = GetConnectionStringCache();
 
-                /// Observaciones
-                string sObs = serviceDto.OriginComments;
+				/// Observaciones
+				string sObs = serviceDto.OriginComments;
 
-                AttributeDto atr = serviceDto.Attributes.SingleOrDefault(a => a.Name == "Tratamiento preferencial");
-                if (atr != null && atr.Value.Length > 2)
-                {
-                    sObs = sObs + " - Tratamiento Preferencial: " + atr.Value;
-                }
+				AttributeDto atr = serviceDto.Attributes.SingleOrDefault(a => a.Name == "Tratamiento preferencial");
+				if (atr != null && atr.Value.Length > 2)
+				{
+					sObs = sObs + " - Tratamiento Preferencial: " + atr.Value;
+				}
 
-                atr = serviceDto.Attributes.SingleOrDefault(a => a.Name == "Módulo de internación");
-                if (atr != null && atr.Value.Length > 2)
-                {
-                    sObs = sObs + " Módulo de internación: " + atr.Value;
-                }
-
-                DevSetServicio vRdo = new GalenoServicios(connectionStringCache).SetServicio(
+				atr = serviceDto.Attributes.SingleOrDefault(a => a.Name == "Módulo de internación");
+				if (atr != null && atr.Value.Length > 2)
+				{
+					sObs = sObs + " Módulo de internación: " + atr.Value;
+				}
+				_logger.Info("Antes de entrar");
+				DevSetServicio vRdo = new GalenoServicios(connectionStringCache).SetServicio(
 						cliCod,
 						nroAut,
 						serviceDto.Id,
 						serviceDto.Address.StreetName,
 						int.Parse(serviceDto.Address.HouseNumber),
 						0,
-                        serviceDto.Address.FloorApt,
+						serviceDto.Address.FloorApt,
 						serviceDto.Address.BetweenStreet1,
 						serviceDto.Address.BetweenStreet2,
 						"",
@@ -61,25 +62,36 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 						"",
 						MapGrado(serviceDto.Classification),
 						"",
-                        sObs,
-                        serviceDto.Address.LatLng.Latitude,
-                        serviceDto.Address.LatLng.Longitude
-                );
+						sObs,
+						serviceDto.Address.LatLng.Latitude,
+						serviceDto.Address.LatLng.Longitude
+				);
 
-                if (vRdo != null)
-                {
-                    return vRdo.Resultado;
-                }
-				
+				if (vRdo == null)
+				{
+					throw new Exception("Error inesperado en GalenoServicios SetServicio ShamanClases.");
+				}
+				else if (!string.IsNullOrEmpty(vRdo.Error))
+				{
+					if (vRdo.Error.Contains("SERVICIO EXISTENTE"))
+						return true;
+					else
+						throw new Exception($"Error inesperado en GalenoServicios SetServicio ShamanClases: {vRdo.Error}.");
+				}
+
+				_logger.Info($"Finalización de almacenamiento de servicio (ID {serviceDto.Id}) en BD.");
+				return vRdo.Resultado;
+
 			}
 			catch (Exception ex)
 			{
 				_logger.Error(ex, ex.Message);
+				_logger.Info($"Finalización CON ERRORES de almacenamiento de servicio (ID {serviceDto.Id}) en BD.");
+				return false;
 			}
-            return false;
-        }
+		}
 
-        public DataTable GetEstadosAsignacion()
+		public DataTable GetEstadosAsignacion()
 		{
 			ConnectionStringCache connectionStringCache = GetConnectionStringCache();
 			DataTable dt = new GalenoServicios(connectionStringCache).GetPamiEstadosAsignacionPendientes(cliCod);
