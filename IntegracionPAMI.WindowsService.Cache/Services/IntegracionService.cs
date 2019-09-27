@@ -37,7 +37,7 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 				{
 					sObs = sObs + " Módulo de internación: " + atr.Value;
 				}
-				_logger.Info("Antes de entrar");
+
 				DevSetServicio vRdo = new GalenoServicios(connectionStringCache).SetServicio(
 						cliCod,
 						nroAut,

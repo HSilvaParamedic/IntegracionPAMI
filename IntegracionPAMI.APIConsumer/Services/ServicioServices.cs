@@ -62,17 +62,17 @@ namespace IntegracionPAMI.APIConsumer.Services
 		{
 			try
 			{
-				_logger.Info("Reconociendo notificación desde API...");
+				_logger.Info($"Reconociendo notificación de servicio (ID {servicioId}) desde API...");
 
 				JObject jsonObject = new JObject(new JProperty("serviceID", servicioId), new JProperty("order", order.ToString()));
 				StringContent content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
 				HttpResponseMessage response = ApiHelper.ApiClient.PutAsync(ConfigurationManager.AppSettings.Get("API_Endpoint_AcknowledgeNotification"), content).Result;
 
-				_logger.Info("Finalización de reconocimiento de notificación desde API.");
+				_logger.Info($"Finalización de reconocimiento de notificación de servicio (ID {servicioId}) desde API.");
 			}
 			catch (Exception)
 			{
-				_logger.Info("Finalización CON ERRORES de reconocimiento de notificación desde API.");
+				_logger.Info($"Finalización CON ERRORES de reconocimiento de notificación de servicio (ID {servicioId}) desde API.");
 				throw;
 			}
 		}
@@ -81,20 +81,20 @@ namespace IntegracionPAMI.APIConsumer.Services
 		{
 			try
 			{
-				_logger.Info("Obteniendo servicio desde API...");
+				_logger.Info($"Obteniendo servicio (ID {id}) desde API...");
 
 				HttpResponseMessage response = ApiHelper.ApiClient.GetAsync($"{ConfigurationManager.AppSettings.Get("API_Endpoint_GetService")}{id}").Result;
 
 				ServiceDto service = JsonConvert.DeserializeObject<ServiceDto>(response.Content.ReadAsStringAsync().Result);
 				service.Id = id;
 
-				_logger.Info("Finalización de obtención de servicio desde API.");
+				_logger.Info($"Finalización de obtención de servicio (ID {id}) desde API.");
 
 				return service;
 			}
 			catch (Exception)
 			{
-				_logger.Info("Finalización CON ERRORES de obtención de servicio desde API.");
+				_logger.Info($"Finalización CON ERRORES de obtención de servicio (ID {id}) desde API.");
 				throw;
 			}
 		}

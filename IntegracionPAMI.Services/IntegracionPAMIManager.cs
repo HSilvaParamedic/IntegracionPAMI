@@ -92,7 +92,9 @@ namespace IntegracionPAMI.Services
 				}
 			}
 
-			StringBuilder sb = new StringBuilder($"Finalización de guardado de servicios. Total por guardar: {notificacionesObtenidasNuevasCount}.");
+			StringBuilder sb = new StringBuilder();
+			sb.AppendLine("Finalización de guardado de servicios.");
+			sb.AppendLine($"Total notificaciones nuevas obtenidas: {notificacionesObtenidasNuevasCount}.");
 
 			if (notificacionesObtenidasNuevasCount != serviciosObtenidosAPICount)
 			{
@@ -112,9 +114,10 @@ namespace IntegracionPAMI.Services
 				sb.AppendLine($"				Total sin notificar API: {servicioIdsNotifacionesReconocidasAPIError.Count()} ({string.Join("|", servicioIdsNotifacionesReconocidasAPIError)});");
 			}
 
-			if(notificacionesObtenidasNuevasCount >0)
+			if (notificacionesObtenidasNuevasCount > 0)
 			{
-				sb.AppendLine($"				TOTAL servicio proceso completo: {servicioProcesoCompletoCount}");
+				sb.AppendLine($"				TOTAL de servicios procesados correctamente: {servicioProcesoCompletoCount}");
+				sb.AppendLine($"				TOTAL de servicios NO procesados por error: {notificacionesObtenidasNuevasCount - servicioProcesoCompletoCount}");
 			}
 
 			_logger.Info(sb.ToString());

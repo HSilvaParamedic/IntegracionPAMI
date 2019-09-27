@@ -75,12 +75,15 @@ namespace IntegracionPAMI.WindowsService.Cache
 			try
 			{
 				_logger.Info("Ejecutando guardado de nuevos servicios...");
+
 				_integracionPAMIManager.GuardarNuevosServicios();
 
-				StringBuilder sb = new StringBuilder("Finalización de guardado de nuevos servicios.");
+				StringBuilder sb = new StringBuilder();
+				sb.AppendLine("Finalización de guardado de nuevos servicios.");
 				sb.AppendLine("=================================================================================================================================================");
 				sb.AppendLine("");
 				_logger.Info(sb.ToString());
+
 				///_integracionPAMIManager.EnviarEstadosAsignacion();
 			}
 			catch (Exception ex)
