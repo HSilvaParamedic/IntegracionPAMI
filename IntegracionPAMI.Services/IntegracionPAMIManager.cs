@@ -144,11 +144,11 @@ namespace IntegracionPAMI.Services
 				/// Marco enviado en DB
 				_integracionServices.SetEstadoAsignacionEnviado(Convert.ToDecimal(dt.Rows[i]["ID"].ToString()), Convert.ToInt32(dt.Rows[i]["EventoId"].ToString()));
 				/// Finalizo en PAMI
-				if ((Convert.ToInt32(dt.Rows[i]["EventoId"]) == 4) || (Convert.ToInt32(dt.Rows[i]["EventoId"]) == 22))
-				{
-					servicioServices.SetDiagnosticUrgencyDegree(dt.Rows[i]["NroServicioString"].ToString(), dt.Rows[i]["Diagnostico"].ToString(), dt.Rows[i]["GradoOperativo"].ToString());
-					servicioServices.Finalize(dt.Rows[i]["NroServicioString"].ToString());
-				}
+				//if ((Convert.ToInt32(dt.Rows[i]["EventoId"]) == 4) || (Convert.ToInt32(dt.Rows[i]["EventoId"]) == 22))
+				//{
+				//	servicioServices.SetDiagnosticUrgencyDegree(dt.Rows[i]["NroServicioString"].ToString(), dt.Rows[i]["Diagnostico"].ToString(), dt.Rows[i]["GradoOperativo"].ToString());
+				//	servicioServices.Finalize(dt.Rows[i]["NroServicioString"].ToString());
+				//}
 			}
 		}
 	}

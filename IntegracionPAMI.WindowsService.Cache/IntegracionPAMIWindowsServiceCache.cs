@@ -74,16 +74,26 @@ namespace IntegracionPAMI.WindowsService.Cache
 		{
 			try
 			{
-				_logger.Info("Ejecutando guardado de nuevos servicios...");
+
+                // Nuevos Servicios
+
+                _logger.Info("Ejecutando guardado de nuevos servicios...");
 				_integracionPAMIManager.GuardarNuevosServicios();
 
 				StringBuilder sb = new StringBuilder("Finalización de guardado de nuevos servicios.");
 				sb.AppendLine("=================================================================================================================================================");
 				sb.AppendLine("");
 				_logger.Info(sb.ToString());
-				///_integracionPAMIManager.EnviarEstadosAsignacion();
-			}
-			catch (Exception ex)
+
+                // Informe de Eventos
+
+                if (int.Parse(ConfigurationManager.AppSettings.Get("ServicioMap_infSucesos")) == 1)
+                {
+                    _integracionPAMIManager.EnviarEstadosAsignacion();
+                }
+
+            }
+            catch (Exception ex)
 			{
 				_logger.Error(ex, ex.Message);
 				_logger.Info("Finalización CON ERRORES de guardado de nuevos servicios.");

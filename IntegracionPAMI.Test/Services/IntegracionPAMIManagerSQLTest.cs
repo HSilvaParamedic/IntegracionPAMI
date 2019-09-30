@@ -65,9 +65,9 @@ namespace IntegracionPAMI.Test.Services
 			Logger _logger = LogManager.GetCurrentClassLogger();
 			try
 			{
-				   IntegracionPAMIManager integracionPAMIManager = new IntegracionPAMIManager(new IntegracionService());
+				IntegracionPAMIManager integracionPAMIManager = new IntegracionPAMIManager(new IntegracionService());
                 integracionPAMIManager.GuardarNuevosServicios();
-                //integracionPAMIManager.GuardarNuevosServiciosDesdeGoing();
+
             }
 			catch (Exception ex)
 			{
