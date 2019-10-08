@@ -111,9 +111,9 @@ namespace IntegracionPAMI.APIConsumer.Services
 
 				_logger.Info("Finalización de establecimiento de estado de asignación desde API.");
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				_logger.Info("Finalización CON ERRORES de establecimiento de estado de asignación desde API.");
+				_logger.Info(string.Format("ServiceId {0} - Suceso {1} - Error {0}", servicioId, description, ex.InnerException.Message));
 				throw;
 			}
 		}
