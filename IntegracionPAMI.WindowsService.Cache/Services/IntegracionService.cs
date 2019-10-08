@@ -97,7 +97,7 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 			DataTable dt = new GalenoServicios(connectionStringCache).GetPamiEstadosAsignacionPendientes(cliCod);
 			for (int i = 0; i < dt.Rows.Count - 1; i++)
 			{
-				if ((int.Parse(dt.Rows[i]["EventoId"].ToString()) == 4) && (int.Parse(dt.Rows[i]["EstadoCierre"].ToString()) == 1))
+				if (int.Parse(dt.Rows[i]["EventoId"].ToString()) == 8)
 				{
 					dt.Rows[i]["GradoOperativoId"] = this.MapGradoToRest(dt.Rows[i]["GradoOperativoId"].ToString());
 				}
