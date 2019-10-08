@@ -118,8 +118,84 @@ namespace IntegracionPAMI.APIConsumer.Services
 			}
 		}
 
-        public void Finalize(string servicioId)
+        public void SetDiagnosticUrgencyDegree(string servicioId, string diagnosticCode, string urgencyDegreeCode)
         {
+			try
+			{
+				_logger.Info("Estableciendo grado de diagnostico desde API...");
+
+				JObject jsonObject = new JObject(new JProperty("ServiceID", servicioId), new JProperty("DiagnosticCode", diagnosticCode), new JProperty("UrgencyDegreeCode", urgencyDegreeCode));
+				StringContent content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
+				HttpResponseMessage response = ApiHelper.ApiClient.PutAsync(ConfigurationManager.AppSettings.Get("API_Endpoint_SetDiagnosticUrgencyDegree"), content).Result;
+
+				_logger.Info("Finalización de establecimiento de grado de diagnostico API.");
+			}
+			catch (Exception)
+			{
+				_logger.Info("Finalización CON ERRORES de establecimiento de grado de diagnostico API.");
+				throw;
+			}
+        }
+
+		public void SetFinalDestination(string servicioId, string finalDestinationCode)
+		{
+			try
+			{
+				_logger.Info("Estableciendo destino final desde API...");
+
+				JObject jsonObject = new JObject(new JProperty("ServiceID", servicioId), new JProperty("FinalDestinationCode", finalDestinationCode));
+				StringContent content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
+				HttpResponseMessage response = ApiHelper.ApiClient.PutAsync(ConfigurationManager.AppSettings.Get("API_Endpoint_SetFinalDestination"), content).Result;
+
+				_logger.Info("Finalización de establecimiento de destino final API.");
+			}
+			catch (Exception)
+			{
+				_logger.Info("Finalización CON ERRORES de establecimiento de destino final API.");
+				throw;
+			}
+		}
+
+		public void SetHealthCareCenter(string servicioId, string heathcareCenter)
+		{
+			try
+			{
+				_logger.Info("Estableciendo centro de salud desde API...");
+
+				JObject jsonObject = new JObject(new JProperty("ServiceID", servicioId), new JProperty("HeathcareCenter", heathcareCenter));
+				StringContent content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
+				HttpResponseMessage response = ApiHelper.ApiClient.PutAsync(ConfigurationManager.AppSettings.Get("API_Endpoint_SetHealthCareCenter"), content).Result;
+
+				_logger.Info("Finalización de establecimiento de centro de salud API.");
+			}
+			catch (Exception)
+			{
+				_logger.Info("Finalización CON ERRORES de establecimiento de centro de salud API.");
+				throw;
+			}
+		}
+
+		public void SetAssignmentComment(string servicioId, string comments)
+		{
+			try
+			{
+				_logger.Info("Estableciendo comentario de asignacion desde API...");
+
+				JObject jsonObject = new JObject(new JProperty("ServiceID", servicioId), new JProperty("Comments", comments));
+				StringContent content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
+				HttpResponseMessage response = ApiHelper.ApiClient.PutAsync(ConfigurationManager.AppSettings.Get("API_Endpoint_SetAssignmentComment"), content).Result;
+
+				_logger.Info("Finalización de comentario de asignacion API.");
+			}
+			catch (Exception)
+			{
+				_logger.Info("Finalización CON ERRORES de comentario de asignacion API.");
+				throw;
+			}
+		}
+
+		public void Finalize(string servicioId)
+		{
 			try
 			{
 				_logger.Info("Finalizando servicio desde API...");
@@ -135,29 +211,10 @@ namespace IntegracionPAMI.APIConsumer.Services
 				_logger.Info("Finalización CON ERRORES del finalizado de servicio desde API.");
 				throw;
 			}
-        }
-
-        public void SetDiagnosticUrgencyDegree(string servicioId, string DiagnosticCode, string UrgencyDegreeCode)
-        {
-			try
-			{
-				_logger.Info("Estableciendo grado de diagnostico desde API...");
-
-				JObject jsonObject = new JObject(new JProperty("ServiceID", servicioId), new JProperty("DiagnosticCode", DiagnosticCode), new JProperty("UrgencyDegreeCode", UrgencyDegreeCode));
-				StringContent content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
-				HttpResponseMessage response = ApiHelper.ApiClient.PutAsync(ConfigurationManager.AppSettings.Get("API_Endpoint_SetDiagnosticUrgencyDegree"), content).Result;
-
-				_logger.Info("Finalización de establecimiento de grado de diagnostico API.");
-			}
-			catch (Exception)
-			{
-				_logger.Info("Finalización CON ERRORES de establecimiento de grado de diagnostico API.");
-				throw;
-			}
-        }
-
-    }
+		}
+	}
 }
+
 //[
 //    {
 //        "description": "Informado al recurso"

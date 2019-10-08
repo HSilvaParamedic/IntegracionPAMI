@@ -59,8 +59,8 @@ namespace IntegracionPAMI.WindowsService.SQL.Services
 					//// Busco equivalencias
 
 					long cnfId = objConfigEquivalencias.GetIDByClienteId(Convert.ToInt64(preInc.ClienteId.GetObjectId()));
-					preInc.GradoOperativoId.SetObjectId(getGradoOperativoId(cnfId, MapGrado(serviceDto.Classification)).ToString());
-					preInc.LocalidadId.SetObjectId(getLocalidadId(cnfId, serviceDto.Address.City).ToString());
+					preInc.GradoOperativoId.SetObjectId(GetGradoOperativoId(cnfId, MapGrado(serviceDto.Classification)).ToString());
+					preInc.LocalidadId.SetObjectId(GetLocalidadId(cnfId, serviceDto.Address.City).ToString());
 
 					preInc.MetodoIngresoId = modDeclares.preIncidenteOrigen.RestServicePAMI;
 
@@ -108,7 +108,7 @@ namespace IntegracionPAMI.WindowsService.SQL.Services
 
 		}
 
-		private long getGradoOperativoId(long cnfId, string grado)
+		private long GetGradoOperativoId(long cnfId, string grado)
 		{
 
 			long gdo = 0;
@@ -138,7 +138,7 @@ namespace IntegracionPAMI.WindowsService.SQL.Services
 			return gdo;
 		}
 
-		private long getLocalidadId(long cnfId, string localidad)
+		private long GetLocalidadId(long cnfId, string localidad)
 		{
 			try
 			{
@@ -185,7 +185,7 @@ namespace IntegracionPAMI.WindowsService.SQL.Services
 			}
 		}
 
-		private long getDiagnosticoId(long cnfId, string abreviaturaId, string descripcion)
+		private long GetDiagnosticoId(long cnfId, string abreviaturaId, string descripcion)
 		{
 			try
 			{
@@ -223,7 +223,7 @@ namespace IntegracionPAMI.WindowsService.SQL.Services
 
 		}
 
-		private long getMotivoNoRealizacionId(long cnfId, string abreviaturaId, string descripcion)
+		private long GetMotivoNoRealizacionId(long cnfId, string abreviaturaId, string descripcion)
 		{
 			try
 			{

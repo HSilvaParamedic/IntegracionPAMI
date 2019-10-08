@@ -8,7 +8,7 @@ using System.Security.AccessControl;
 using IntegracionPAMI.Services;
 using IntegracionPAMI.WindowsService.SQL.Services;
 using NLog;
-
+using System.Text;
 
 namespace IntegracionPAMI.WindowsService.SQL
 {
@@ -41,7 +41,7 @@ namespace IntegracionPAMI.WindowsService.SQL
 				ElapsedHandler();
 
 				timer = new Timer();
-				timer.Interval = int.Parse(ConfigurationManager.AppSettings.Get("IntervaloDeEjecucion_Mins")) * 10000;
+				timer.Interval = int.Parse(ConfigurationManager.AppSettings.Get("IntervaloDeEjecucion_Mins")) * 60000;
 				timer.Elapsed += new ElapsedEventHandler(this.OnTimer);
 				timer.Start();
 
@@ -75,9 +75,15 @@ namespace IntegracionPAMI.WindowsService.SQL
 		{
 			try
 			{
+				// Nuevos Servicios
 				_logger.Info("Ejecutando guardado de nuevos servicios...");
 				_integracionPAMIManager.GuardarNuevosServicios();
-				_logger.Info("Finalización de guardado de nuevos servicios...");
+
+				StringBuilder sb = new StringBuilder("Finalización de guardado de nuevos servicios.");
+				sb.AppendLine("=================================================================================================================================================");
+				sb.AppendLine("");
+				_logger.Info(sb.ToString());
+
 				///_integracionPAMIManager.EnviarEstadosAsignacion();
 			}
 			catch (Exception ex)
