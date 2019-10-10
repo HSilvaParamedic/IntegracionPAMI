@@ -142,8 +142,8 @@ namespace IntegracionPAMI.Services
 
 			for (int i = 0; i < dt.Rows.Count; i++)
 			{
-                /// Envío a PAMI
 
+                /// Envío a PAMI
                 string sNroServicio = dt.Rows[i]["NroServicioString"].ToString();
                 if (sNroServicio == "")
                 {
@@ -151,55 +151,33 @@ namespace IntegracionPAMI.Services
                 }
 
                 /// Centro de Derivación
-                if (dt.Rows[i]["LugarDerivacion"].ToString() != "")
+                if (dt.Rows[i]["LugarDerivacion"].ToString().Length > 3)
                 {
-
+                    servicioServices.SetHealthCareCenter(sNroServicio, dt.Rows[i]["LugarDerivacion"].ToString());
                 }
 
-                //// Suceso de PAMI
-                try
+                /// Evento
+                
+                if (servicioServices.SetAssigmentState(sNroServicio, dt.Rows[i]["Evento"].ToString()))
                 {
-                    servicioServices.SetAssigmentState(sNroServicio, dt.Rows[i]["Evento"].ToString());
-                }
-                catch (Exception)
-                {
-                    /// No hay acción por ahora
-                }
 
-                /// Marco enviado en DB
-                _integracionServices.SetEstadoAsignacionEnviado(Convert.ToDecimal(dt.Rows[i]["ID"].ToString()), Convert.ToInt32(dt.Rows[i]["EventoId"].ToString()));
-
-
-                /// Finalizo en PAMI
-                if (Convert.ToInt32(dt.Rows[i]["EventoId"]) == 8)
-                {
-                    try
-                    {
-                        servicioServices.SetAssigmentState(sNroServicio, "9");
-                    }
-                    catch (Exception)
-                    {
-                        /// No hay acción por ahora
-                    }
                     /// Marco enviado en DB
-                    _integracionServices.SetEstadoAsignacionEnviado(Convert.ToDecimal(dt.Rows[i]["ID"].ToString()), 9);
+                    _integracionServices.SetEstadoAsignacionEnviado(Convert.ToDecimal(dt.Rows[i]["ID"].ToString()), Convert.ToInt32(dt.Rows[i]["EventoId"].ToString()));
 
-                    try
+                    /// Finalizo en PAMI
+                    if (Convert.ToInt32(dt.Rows[i]["EventoId"]) == 8)
                     {
-                        servicioServices.SetDiagnosticUrgencyDegree(sNroServicio, dt.Rows[i]["Diagnostico"].ToString(), dt.Rows[i]["GradoOperativo"].ToString());
-                    }
-                    catch (Exception)
-                    {
-                        /// No hay acción por ahora
-                    }
+                        /// Envío el disponible
+                        servicioServices.SetAssigmentState(sNroServicio, "Disponible");
+                        /// Marco enviado en DB
+                        _integracionServices.SetEstadoAsignacionEnviado(Convert.ToDecimal(dt.Rows[i]["ID"].ToString()), 9);
 
-                    try
-                    {
-                        servicioServices.Finalize(sNroServicio);
-                    }
-                    catch (Exception)
-                    {
-                        /// No hay acción por ahora
+                        /// Diagnostico y finalize
+                        if (servicioServices.SetDiagnosticUrgencyDegree(sNroServicio, dt.Rows[i]["Diagnostico"].ToString(), dt.Rows[i]["GradoOperativo"].ToString()))
+                        {
+                            servicioServices.Finalize(sNroServicio);
+                        }
+
                     }
                 }
             }

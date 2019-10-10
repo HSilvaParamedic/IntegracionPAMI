@@ -26,7 +26,9 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 				/// Observaciones
 				string sObs = serviceDto.OriginComments;
 
-				AttributeDto atr = serviceDto.Attributes.SingleOrDefault(a => a.Name == "Tratamiento preferencial");
+                sObs = sObs + " - Grado PAMI: " + serviceDto.Classification;
+
+                AttributeDto atr = serviceDto.Attributes.SingleOrDefault(a => a.Name == "Tratamiento preferencial");
 				if (atr != null && atr.Value.Length > 2)
 				{
 					sObs = sObs + " - Tratamiento Preferencial: " + atr.Value;
@@ -38,7 +40,7 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 					sObs = sObs + " Módulo de internación: " + atr.Value;
 				}
 
-				DevSetServicio vRdo = new GalenoServicios(connectionStringCache).SetServicio(
+                DevSetServicio vRdo = new GalenoServicios(connectionStringCache).SetServicio(
 						cliCod,
 						nroAut,
 						serviceDto.Id,
@@ -95,13 +97,6 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 		{
 			ConnectionStringCache connectionStringCache = GetConnectionStringCache();
 			DataTable dt = new GalenoServicios(connectionStringCache).GetPamiEstadosAsignacionPendientes(cliCod);
-			for (int i = 0; i < dt.Rows.Count - 1; i++)
-			{
-				if (int.Parse(dt.Rows[i]["EventoId"].ToString()) == 8)
-				{
-					dt.Rows[i]["GradoOperativoId"] = this.MapGradoToRest(dt.Rows[i]["GradoOperativoId"].ToString());
-				}
-			}
 			return dt;
 		}
 
@@ -169,20 +164,6 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 			}
 		}
 
-		private string MapGradoToRest(string grade)
-		{
-			switch (grade.Trim())
-			{
-				case "V":
-					return "Verde";
-				case "A":
-					return "Amarillo";
-				case "R":
-					return "Rojo";
-				default:
-					return "";
-			}
-		}
 
 		private string MapEdad(int age, string ageUnit)
 		{

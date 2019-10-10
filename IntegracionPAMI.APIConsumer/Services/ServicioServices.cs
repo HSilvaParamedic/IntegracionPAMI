@@ -99,41 +99,44 @@ namespace IntegracionPAMI.APIConsumer.Services
 			}
 		}
 
-		public void SetAssigmentState(string servicioId, string description)
+		public bool SetAssigmentState(string servicioId, string description)
 		{
 			try
 			{
-				_logger.Info("Estableciendo estado de asignación desde API...");
+				_logger.Info(string.Format("SetAssigmentState: Estableciendo {0} para Servicio {1}", description, servicioId));
 
 				JObject jsonObject = new JObject(new JProperty("serviceID", servicioId), new JProperty("description", description));
 				StringContent content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
 				HttpResponseMessage response = ApiHelper.ApiClient.PutAsync(ConfigurationManager.AppSettings.Get("API_Endpoint_SetAssignmentState"), content).Result;
 
-				_logger.Info("Finalización de establecimiento de estado de asignación desde API.");
-			}
+                _logger.Info(string.Format("SetAssigmentState: Registrado Ok Servicio {0}", servicioId));
+
+            }
 			catch (Exception ex)
 			{
-				_logger.Info(string.Format("ServiceId {0} - Suceso {1} - Error {0}", servicioId, description, ex.InnerException.Message));
-				throw;
+				_logger.Info(string.Format("SetAssigmentState: Error {0}", ex.InnerException.Message));
+                if (ex.InnerException.Message == "El incidente consultado no esta asignado al usuario indicado") { return false; };
 			}
-		}
+            return true;
+        }
 
-        public void SetDiagnosticUrgencyDegree(string servicioId, string diagnosticCode, string urgencyDegreeCode)
+        public bool SetDiagnosticUrgencyDegree(string servicioId, string diagnosticCode, string urgencyDegreeCode)
         {
 			try
 			{
-				_logger.Info("Estableciendo grado de diagnostico desde API...");
+                _logger.Info(string.Format("SetDiagnosticUrgencyDegree: Estableciendo {0}, {1} para Servicio {2}", diagnosticCode, urgencyDegreeCode, servicioId));
 
-				JObject jsonObject = new JObject(new JProperty("ServiceID", servicioId), new JProperty("DiagnosticCode", diagnosticCode), new JProperty("UrgencyDegreeCode", urgencyDegreeCode));
+                JObject jsonObject = new JObject(new JProperty("ServiceID", servicioId), new JProperty("DiagnosticCode", diagnosticCode), new JProperty("UrgencyDegreeCode", urgencyDegreeCode));
 				StringContent content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
 				HttpResponseMessage response = ApiHelper.ApiClient.PutAsync(ConfigurationManager.AppSettings.Get("API_Endpoint_SetDiagnosticUrgencyDegree"), content).Result;
 
-				_logger.Info("Finalización de establecimiento de grado de diagnostico API.");
-			}
-			catch (Exception)
+                _logger.Info(string.Format("SetDiagnosticUrgencyDegree: Registrado Ok Servicio {0}", servicioId));
+                return true;
+            }
+			catch (Exception ex)
 			{
-				_logger.Info("Finalización CON ERRORES de establecimiento de grado de diagnostico API.");
-				throw;
+                _logger.Info(string.Format("SetDiagnosticUrgencyDegree: Error {0}", ex.InnerException.Message));
+                return false;
 			}
         }
 
@@ -141,108 +144,79 @@ namespace IntegracionPAMI.APIConsumer.Services
 		{
 			try
 			{
-				_logger.Info("Estableciendo destino final desde API...");
+                _logger.Info(string.Format("SetFinalDestination: Estableciendo {0} para Servicio {1}", finalDestinationCode, servicioId));
 
-				JObject jsonObject = new JObject(new JProperty("ServiceID", servicioId), new JProperty("FinalDestinationCode", finalDestinationCode));
+                JObject jsonObject = new JObject(new JProperty("ServiceID", servicioId), new JProperty("FinalDestinationCode", finalDestinationCode));
 				StringContent content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
 				HttpResponseMessage response = ApiHelper.ApiClient.PutAsync(ConfigurationManager.AppSettings.Get("API_Endpoint_SetFinalDestination"), content).Result;
 
-				_logger.Info("Finalización de establecimiento de destino final API.");
-			}
-			catch (Exception)
+                _logger.Info(string.Format("SetFinalDestination: Registrado Ok Servicio {0}", servicioId));
+            }
+            catch (Exception ex)
 			{
-				_logger.Info("Finalización CON ERRORES de establecimiento de destino final API.");
-				throw;
+                _logger.Info(string.Format("SetFinalDestination: Error {0}", ex.InnerException.Message));
+                throw;
 			}
 		}
 
-		public void SetHealthCareCenter(string servicioId, string heathcareCenter)
+		public bool SetHealthCareCenter(string servicioId, string heathcareCenter)
 		{
 			try
 			{
-				_logger.Info("Estableciendo centro de salud desde API...");
+                _logger.Info(string.Format("SetHealthCareCenter: Estableciendo {0} para Servicio {1}", heathcareCenter, servicioId));
 
-				JObject jsonObject = new JObject(new JProperty("ServiceID", servicioId), new JProperty("HeathcareCenter", heathcareCenter));
+                JObject jsonObject = new JObject(new JProperty("ServiceID", servicioId), new JProperty("HeathcareCenter", heathcareCenter));
 				StringContent content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
 				HttpResponseMessage response = ApiHelper.ApiClient.PutAsync(ConfigurationManager.AppSettings.Get("API_Endpoint_SetHealthCareCenter"), content).Result;
 
-				_logger.Info("Finalización de establecimiento de centro de salud API.");
+                _logger.Info(string.Format("SetHealthCareCenter: Registrado Ok Servicio {0}", servicioId));
+                return true;
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				_logger.Info("Finalización CON ERRORES de establecimiento de centro de salud API.");
-				throw;
-			}
+                _logger.Info(string.Format("SetHealthCareCenter: Error {0}", ex.InnerException.Message));
+                return false;
+            }
 		}
 
-		public void SetAssignmentComment(string servicioId, string comments)
+		public bool SetAssignmentComment(string servicioId, string comments)
 		{
 			try
 			{
-				_logger.Info("Estableciendo comentario de asignacion desde API...");
+                _logger.Info(string.Format("SetAssignmentComment: Estableciendo {0} para Servicio {1}", comments, servicioId));
 
-				JObject jsonObject = new JObject(new JProperty("ServiceID", servicioId), new JProperty("Comments", comments));
+                JObject jsonObject = new JObject(new JProperty("ServiceID", servicioId), new JProperty("Comments", comments));
 				StringContent content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
 				HttpResponseMessage response = ApiHelper.ApiClient.PutAsync(ConfigurationManager.AppSettings.Get("API_Endpoint_SetAssignmentComment"), content).Result;
 
-				_logger.Info("Finalización de comentario de asignacion API.");
-			}
-			catch (Exception)
-			{
-				_logger.Info("Finalización CON ERRORES de comentario de asignacion API.");
-				throw;
-			}
-		}
+                _logger.Info(string.Format("SetAssignmentComment: Registrado Ok Servicio {0}", servicioId));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.Info(string.Format("SetHealthCareCenter: Error {0}", ex.InnerException.Message));
+                return false;
+            }
+        }
 
-		public void Finalize(string servicioId)
+		public bool Finalize(string servicioId)
 		{
 			try
 			{
-				_logger.Info("Finalizando servicio desde API...");
+                _logger.Info(string.Format("Finalize: Estableciendo para Servicio {1}", servicioId));
 
-				JObject jsonObject = new JObject(new JProperty("serviceID", servicioId));
+                JObject jsonObject = new JObject(new JProperty("serviceID", servicioId));
 				StringContent content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
 				HttpResponseMessage response = ApiHelper.ApiClient.PutAsync(ConfigurationManager.AppSettings.Get("API_Endpoint_Finalize"), content).Result;
 
-				_logger.Info("Finalización del finalizado de servicio desde API.");
+                _logger.Info(string.Format("Finalize: Registrado Ok Servicio {0}", servicioId));
+                return true;
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				_logger.Info("Finalización CON ERRORES del finalizado de servicio desde API.");
-				throw;
-			}
+                _logger.Info(string.Format("Finalize: Error {0}", ex.InnerException.Message));
+                return false;
+            }
 		}
 	}
 }
-
-//[
-//    {
-//        "description": "Informado al recurso"
-//    },
-//    {
-//        "description": "Despachado"
-//    },
-//    {
-//        "description": "Rumbo a incidente"
-//    },
-//    {
-//        "description": "En incidente"
-//    },
-//    {
-//        "description": "En espera de derivación"
-//    },
-//    {
-//        "description": "Rumbo a lugar de derivación"
-//    },
-//    {
-//        "description": "En lugar de derivación"
-//    },
-//    {
-//        "description": "Rumbo a base/Deja al paciente"
-//    },
-//    {
-//        "description": "Disponible"
-//    }
-//]
-
-	//{"ServiceID":"0010004173", "Description":"Disponible"}

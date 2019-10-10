@@ -40,8 +40,9 @@ namespace IntegracionPAMI.WindowsService.Cache
 				ElapsedHandler();
 
 				timer = new Timer();
-				timer.Interval = int.Parse(ConfigurationManager.AppSettings.Get("IntervaloDeEjecucion_Mins")) * 60000;
-				timer.Elapsed += new ElapsedEventHandler(this.OnTimer);
+                //timer.Interval = int.Parse(ConfigurationManager.AppSettings.Get("IntervaloDeEjecucion_Mins")) * 60000;
+                timer.Interval = int.Parse(ConfigurationManager.AppSettings.Get("IntervaloDeEjecucion_Mins")) * 1000;
+                timer.Elapsed += new ElapsedEventHandler(this.OnTimer);
 				timer.Start();
 
 				_logger.Info("Se inició el servicio");
@@ -75,24 +76,35 @@ namespace IntegracionPAMI.WindowsService.Cache
 			try
 			{
 
-				// Nuevos Servicios
-				_logger.Info("Ejecutando guardado de nuevos servicios...");
-				_integracionPAMIManager.GuardarNuevosServicios();
-
-				StringBuilder sb = new StringBuilder("Finalización de guardado de nuevos servicios.");
-				sb.AppendLine("=================================================================================================================================================");
-				sb.AppendLine("");
-				_logger.Info(sb.ToString());
-
-				// Informe de Eventos
-				if (int.Parse(ConfigurationManager.AppSettings.Get("ServicioMap_infSucesos")) == 1)
+                // Informe de Eventos
+                if (int.Parse(ConfigurationManager.AppSettings.Get("ServicioMap_infSucesos")) == 1)
                 {
                     _logger.Info("Enviando estados de asignación");
                     _integracionPAMIManager.EnviarEstadosAsignacion();
-			}
+
+                    /*
+                    sb = new StringBuilder("Finalización de envio de estados de asignación");
+                    sb.AppendLine("=================================================================================================================================================");
+                    sb.AppendLine("");
+                    _logger.Info(sb.ToString());
+                    */
+
+                }
+
+                // Nuevos Servicios
+                _logger.Info("Ejecutando guardado de nuevos servicios...");
+                _integracionPAMIManager.GuardarNuevosServicios();
+
+                /*
+                StringBuilder sb = new StringBuilder("Finalización de guardado de nuevos servicios.");
+                sb.AppendLine("=================================================================================================================================================");
+                sb.AppendLine("");
+                _logger.Info(sb.ToString());
+                */
+
 
             }
-			catch (Exception ex)
+            catch (Exception ex)
 			{
 				_logger.Error(ex, ex.Message);
 				_logger.Info("Finalización CON ERRORES de guardado de nuevos servicios.");
