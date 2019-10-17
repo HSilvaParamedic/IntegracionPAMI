@@ -73,6 +73,7 @@
     <Compile Include="Helpers\ApiHelper.cs" />
     <Compile Include="Helpers\AuthHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\DevOps.cs" />
     <Compile Include="Services\ServicioServices.cs" />
     <Compile Include="Dto\TriageDto.cs" />
   </ItemGroup>

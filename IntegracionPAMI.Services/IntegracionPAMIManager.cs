@@ -158,23 +158,31 @@ namespace IntegracionPAMI.Services
 
                 /// Evento
                 
-                if (servicioServices.SetAssigmentState(sNroServicio, dt.Rows[i]["Evento"].ToString()))
+                if (servicioServices.SetAssigmentState(sNroServicio, dt.Rows[i]["Evento"].ToString()).Resultado)
                 {
 
                     /// Marco enviado en DB
                     _integracionServices.SetEstadoAsignacionEnviado(Convert.ToDecimal(dt.Rows[i]["ID"].ToString()), Convert.ToInt32(dt.Rows[i]["EventoId"].ToString()));
 
                     /// Finalizo en PAMI
-                    if (Convert.ToInt32(dt.Rows[i]["EventoId"]) == 8)
+                    if ((Convert.ToInt32(dt.Rows[i]["EventoId"]) == 8)||(Convert.ToInt32(dt.Rows[i]["EventoId"]) == 28))
                     {
                         /// Envío el disponible
                         servicioServices.SetAssigmentState(sNroServicio, "Disponible");
                         /// Marco enviado en DB
-                        _integracionServices.SetEstadoAsignacionEnviado(Convert.ToDecimal(dt.Rows[i]["ID"].ToString()), 9);
+                        if (Convert.ToInt32(dt.Rows[i]["EventoId"]) == 8)
+                        {
+                            _integracionServices.SetEstadoAsignacionEnviado(Convert.ToDecimal(dt.Rows[i]["ID"].ToString()), 9);
+                        }
+                        else
+                        {
+                            _integracionServices.SetEstadoAsignacionEnviado(Convert.ToDecimal(dt.Rows[i]["ID"].ToString()), 29);
+                        }
 
                         /// Diagnostico y finalize
-                        if (servicioServices.SetDiagnosticUrgencyDegree(sNroServicio, dt.Rows[i]["Diagnostico"].ToString(), dt.Rows[i]["GradoOperativo"].ToString()))
+                        if (servicioServices.SetDiagnosticUrgencyDegree(sNroServicio, dt.Rows[i]["Diagnostico"].ToString(), dt.Rows[i]["GradoOperativo"].ToString()).Resultado)
                         {
+                            //servicioServices.SetFinalDestination(sNroServicio, "");
                             servicioServices.Finalize(sNroServicio);
                         }
 

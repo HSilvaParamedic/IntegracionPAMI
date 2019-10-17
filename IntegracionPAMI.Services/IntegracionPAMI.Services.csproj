@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DevOps.cs" />
     <Compile Include="IntegracionPAMIManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="IIntegracionServices.cs" />
