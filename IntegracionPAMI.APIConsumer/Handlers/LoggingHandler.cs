@@ -21,7 +21,9 @@ namespace IntegracionPAMI.APIConsumer.Handlers
 
 				string responseMessage = await response.Content.ReadAsStringAsync();
 
-				if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                //_logger.Info(string.Format("Url {0}{1}Response {2}", request.RequestUri.AbsoluteUri, Environment.NewLine, responseMessage));
+
+                if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
 				{
 					if(responseMessage.Contains("error_description"))
 					{

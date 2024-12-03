@@ -38,15 +38,16 @@ namespace IntegracionPAMI.WindowsService.SQL
 			try
 			{
 
+				_logger.Info("Se inició el servicio");
+				_logger.Info(string.Format("API_Username: {0}", ConfigurationManager.AppSettings.Get("API_Username")));
+
 				ElapsedHandler();
 
 				timer = new Timer();
-                //timer.Interval = int.Parse(ConfigurationManager.AppSettings.Get("IntervaloDeEjecucion_Mins")) * 60000;
-                timer.Interval = int.Parse(ConfigurationManager.AppSettings.Get("IntervaloDeEjecucion_Mins")) * 1000;
+                timer.Interval = int.Parse(ConfigurationManager.AppSettings.Get("IntervaloDeEjecucion_Segs")) * 1000;
                 timer.Elapsed += new ElapsedEventHandler(this.OnTimer);
 				timer.Start();
 
-				_logger.Info("Se inició el servicio");
 			}
 			catch (Exception ex)
 			{
@@ -74,38 +75,44 @@ namespace IntegracionPAMI.WindowsService.SQL
 
 		private void ElapsedHandler()
 		{
+
+			if (this.timer != null) { this.timer.Enabled = false; }
+
 			try
 			{
-                // Informe de Eventos
-                if (int.Parse(ConfigurationManager.AppSettings.Get("ServicioMap_infSucesos")) == 1)
+
+				// Informe de Eventos
+				if (int.Parse(ConfigurationManager.AppSettings.Get("ServicioMap_infSucesos")) == 1)
                 {
                     _logger.Info("Enviando estados de asignación");
                     _integracionPAMIManager.EnviarEstadosAsignacion();
-
-                    /*
-                    sb = new StringBuilder("Finalización de envio de estados de asignación");
-                    sb.AppendLine("=================================================================================================================================================");
-                    sb.AppendLine("");
-                    _logger.Info(sb.ToString());
-                    */
 
                 }
 
                 // Nuevos Servicios
                 _logger.Info("Ejecutando guardado de nuevos servicios...");
-                //_integracionPAMIManager.GuardarNuevosServicios();
+                _integracionPAMIManager.GuardarNuevosServicios("Nuevo");
 
-                /*
-                StringBuilder sb = new StringBuilder("Finalización de guardado de nuevos servicios.");
-                sb.AppendLine("=================================================================================================================================================");
-                sb.AppendLine("");
-                _logger.Info(sb.ToString());
-                */
-            }
-            catch (Exception ex)
+				// Reiteración
+				_logger.Info("Ejecutando reiteraciones de servicios...");
+				_integracionPAMIManager.GuardarNuevosServicios("Reiteración");
+
+				// Reclamo
+				_logger.Info("Ejecutando reclamos de servicios...");
+				_integracionPAMIManager.GuardarNuevosServicios("Reclamo");
+
+				// Anulados
+				_logger.Info("Ejecutando anulaciones de servicios...");
+				_integracionPAMIManager.GuardarNuevosServicios("Anulación");
+
+			}
+			catch (Exception ex)
 			{
 				_logger.Error(ex, ex.Message);
 			}
+
+			if (this.timer != null) { this.timer.Enabled = true; }
+
 		}
 
 		#region Public Methods

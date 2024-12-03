@@ -7,10 +7,16 @@ using System.Threading.Tasks;
 
 public class DevOps
 {
-    public bool Resultado { get; set; }
+    public enum result
+    {
+        OK,
+        Warning,
+        Error
+    }
+    public result Resultado { get; set; }
     public string DescripcionError { get; set; }
 
-    public DevOps(bool pResultado, string pDescripcionError)
+    public DevOps(result pResultado, string pDescripcionError)
     {
         this.Resultado = pResultado;
         this.DescripcionError = pDescripcionError;
@@ -18,13 +24,13 @@ public class DevOps
 
     public DevOps(string pDescripcionError)
     {
-        this.Resultado = false;
+        this.Resultado = result.Error;
         this.DescripcionError = pDescripcionError;
     }
 
     public DevOps()
     {
-        this.Resultado = true;
+        this.Resultado = result.OK;
         this.DescripcionError = "";
     }
 

@@ -73,11 +73,14 @@ namespace IntegracionPAMI.WindowsService.Cache
 
 		private void ElapsedHandler()
 		{
+
+			if (this.timer != null) { this.timer.Enabled = false; }
+
 			try
 			{
 
-                // Informe de Eventos
-                if (int.Parse(ConfigurationManager.AppSettings.Get("ServicioMap_infSucesos")) == 1)
+				// Informe de Eventos
+				if (int.Parse(ConfigurationManager.AppSettings.Get("ServicioMap_infSucesos")) == 1)
                 {
                     _logger.Info("Enviando estados de asignación");
                     _integracionPAMIManager.EnviarEstadosAsignacion();
@@ -91,24 +94,32 @@ namespace IntegracionPAMI.WindowsService.Cache
 
                 }
 
-                // Nuevos Servicios
-                _logger.Info("Ejecutando guardado de nuevos servicios...");
-                _integracionPAMIManager.GuardarNuevosServicios();
+				// Nuevos Servicios
+				_logger.Info("Ejecutando guardado de nuevos servicios...");
+				_integracionPAMIManager.GuardarNuevosServicios("Nuevo");
 
-                /*
-                StringBuilder sb = new StringBuilder("Finalización de guardado de nuevos servicios.");
-                sb.AppendLine("=================================================================================================================================================");
-                sb.AppendLine("");
-                _logger.Info(sb.ToString());
-                */
+				// Reiteración
+				//_logger.Info("Ejecutando reiteraciones de servicios...");
+				//_integracionPAMIManager.GuardarNuevosServicios("Reiteración");
+
+				// Reclamo
+				_logger.Info("Ejecutando reclamos de servicios...");
+				_integracionPAMIManager.GuardarNuevosServicios("Reclamo");
+
+				// Anulados
+				//_logger.Info("Ejecutando anulaciones de servicios...");
+				//_integracionPAMIManager.GuardarNuevosServicios("Anulación");
 
 
-            }
-            catch (Exception ex)
+			}
+			catch (Exception ex)
 			{
 				_logger.Error(ex, ex.Message);
 				_logger.Info("Finalización CON ERRORES de guardado de nuevos servicios.");
 			}
+
+			if (this.timer != null) { this.timer.Enabled = true; }
+
 		}
 
 		#region Public Methods

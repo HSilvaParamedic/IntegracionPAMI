@@ -30,9 +30,10 @@ namespace IntegracionPAMI.APIConsumer.Services
 
 				return notificationList.Notifications.AsEnumerable();
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				_logger.Info("Finalización CON ERRORES de obtención de nuevas notificaciones desde API.");
+                _logger.Info(string.Format("GetNuevasNotifications: Error {0}", ex.InnerException.Message));
+                _logger.Info("Finalización CON ERRORES de obtención de nuevas notificaciones desde API.");
 				throw;
 			}
 		}
@@ -70,7 +71,7 @@ namespace IntegracionPAMI.APIConsumer.Services
 
 				_logger.Info($"Finalización de reconocimiento de notificación de servicio (ID {servicioId}) desde API.");
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
 				_logger.Info($"Finalización CON ERRORES de reconocimiento de notificación de servicio (ID {servicioId}) desde API.");
 				throw;
@@ -92,9 +93,11 @@ namespace IntegracionPAMI.APIConsumer.Services
 
 				return service;
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				_logger.Info($"Finalización CON ERRORES de obtención de servicio (ID {id}) desde API.");
+                _logger.Info(string.Format("GetServicio: Error {0}", ex.InnerException.Message));
+                _logger.Info($"Finalización CON ERRORES de obtención de servicio (ID {id}) desde API.");
+
 				throw;
 			}
 		}
@@ -115,11 +118,28 @@ namespace IntegracionPAMI.APIConsumer.Services
 			catch (Exception ex)
 			{
 				_logger.Info(string.Format("SetAssigmentState: Error {0}", ex.InnerException.Message));
-                if (ex.InnerException.Message == "Hay al menos un Estado intermedio cuyo instante no fue ingresado") { return new DevOps(); };
-                if (ex.InnerException.Message == "El estado al que se quiere llegar no es correlativo con el anterior") { return new DevOps(); };
-                return new DevOps(false, string.Format("SetAssigmentState: Error {0}", ex.InnerException.Message));
-            }
-
+                if (ex.InnerException.Message == "Hay al menos un Estado intermedio cuyo instante no fue ingresado") {
+					return new DevOps(DevOps.result.Warning, ex.InnerException.Message);
+				}
+				else
+                {
+					if (ex.InnerException.Message.Contains("correlativo con el anterior"))
+					{
+						return new DevOps(DevOps.result.Warning, ex.InnerException.Message);
+					}
+					else
+                    {
+						if (ex.InnerException.Message.Contains("no esta asignado al usuario indicado"))
+						{
+							return new DevOps(DevOps.result.Warning, ex.InnerException.Message);
+						}
+						else
+						{
+							return new DevOps(ex.InnerException.Message);
+						}
+					}
+				}
+			}
         }
 
         public DevOps SetDiagnosticUrgencyDegree(string servicioId, string diagnosticCode, string urgencyDegreeCode)
@@ -133,16 +153,13 @@ namespace IntegracionPAMI.APIConsumer.Services
 				HttpResponseMessage response = ApiHelper.ApiClient.PutAsync(ConfigurationManager.AppSettings.Get("API_Endpoint_SetDiagnosticUrgencyDegree"), content).Result;
                 
                 _logger.Info(string.Format("SetDiagnosticUrgencyDegree: Registrado Ok Servicio {0}", servicioId));
-                _logger.Info(string.Format("SetDiagnosticUrgencyDegree: StatusCode {0}", response.StatusCode.ToString()));
-                _logger.Info(string.Format("SetDiagnosticUrgencyDegree: IsSuccessStatusCode {0}", response.IsSuccessStatusCode.ToString()));
-                _logger.Info(string.Format("SetDiagnosticUrgencyDegree: RequestMessage {0}", response.RequestMessage.ToString()));
 
                 return new DevOps();
             }
 			catch (Exception ex)
 			{
                 _logger.Info(string.Format("SetDiagnosticUrgencyDegree: Error {0}", ex.InnerException.Message));
-                return new DevOps(false, string.Format("SetDiagnosticUrgencyDegree: Error {0}", ex.InnerException.Message));
+                return new DevOps(string.Format("SetDiagnosticUrgencyDegree: Error {0}", ex.InnerException.Message));
             }
         }
 
@@ -164,7 +181,7 @@ namespace IntegracionPAMI.APIConsumer.Services
 			{
                 _logger.Info(string.Format("SetFinalDestination: Error {0}", ex.InnerException.Message));
 
-                return new DevOps(false, string.Format("SetFinalDestination: Error {0}", ex.InnerException.Message));
+                return new DevOps( string.Format("SetFinalDestination: Error {0}", ex.InnerException.Message));
             }
         }
 
@@ -184,7 +201,7 @@ namespace IntegracionPAMI.APIConsumer.Services
             catch (Exception ex)
 			{
                 _logger.Info(string.Format("SetHealthCareCenter: Error {0}", ex.InnerException.Message));
-                return new DevOps(false, string.Format("SetHealthCareCenter: Error {0}", ex.InnerException.Message));
+                return new DevOps(string.Format("SetHealthCareCenter: Error {0}", ex.InnerException.Message));
             }
         }
 
@@ -204,7 +221,7 @@ namespace IntegracionPAMI.APIConsumer.Services
             catch (Exception ex)
             {
                 _logger.Info(string.Format("SetAssignmentComment: Error {0}", ex.InnerException.Message));
-                return new DevOps(false, string.Format("SetAssignmentComment: Error {0}", ex.InnerException.Message));
+                return new DevOps(string.Format("SetAssignmentComment: Error {0}", ex.InnerException.Message));
             }
         }
 
@@ -224,7 +241,7 @@ namespace IntegracionPAMI.APIConsumer.Services
             catch (Exception ex)
 			{
                 _logger.Info(string.Format("Finalize: Error {0}", ex.InnerException.Message));
-                return new DevOps(false, string.Format("Finalize: Error {0}", ex.InnerException.Message));
+                return new DevOps(string.Format("Finalize: Error {0}", ex.InnerException.Message));
             }
         }
 	}

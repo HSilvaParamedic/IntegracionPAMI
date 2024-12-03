@@ -14,11 +14,36 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 		private static Logger _logger = LogManager.GetCurrentClassLogger();
 		private string cliCod = ConfigurationManager.AppSettings.Get("ServicioMap_pCliCod");
 		private int nroAut = int.Parse(ConfigurationManager.AppSettings.Get("ServicioMap_pNroAut"));
+		private bool useSuperRojo = int.Parse(ConfigurationManager.AppSettings.Get("ServicioMap_SuperRojo")) == 0 ? false : true;
 
-		public bool AlmacenarEnBaseDedatos(ServiceDto serviceDto)
+		public bool AlmacenarEnBaseDedatos(string strNotificationType, ServiceDto serviceDto)
 		{
 			try
 			{
+
+				switch (strNotificationType)
+				{
+					case "Nuevo":
+						return this.CrearNuevo(serviceDto);
+					case "Reiteración":
+						return this.EstablecerReiteracion(serviceDto);
+				}
+
+			}
+			catch (Exception ex)
+			{
+				_logger.Error(ex, ex.Message);
+				_logger.Info($"Finalización CON ERRORES de almacenamiento de servicio (ID {serviceDto.Id}) en BD.");
+				
+			}
+			return false;
+		}
+
+		private bool CrearNuevo(ServiceDto serviceDto)
+		{
+			try
+			{
+
 				_logger.Info($"Almacenando servicio (ID {serviceDto.Id}) en BD...");
 
 				ConnectionStringCache connectionStringCache = GetConnectionStringCache();
@@ -26,21 +51,62 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 				/// Observaciones
 				string sObs = serviceDto.OriginComments;
 
-                sObs = sObs + " - Grado PAMI: " + serviceDto.Classification;
+				sObs = sObs + " - Grado PAMI: " + serviceDto.Classification;
 
-                AttributeDto atr = serviceDto.Attributes.SingleOrDefault(a => a.Name == "Tratamiento preferencial");
+				//// Tratamiento Preferencial
+
+				AttributeDto atr = serviceDto.Attributes.SingleOrDefault(a => a.Name == "Tratamiento preferencial");
 				if (atr != null && atr.Value.Length > 2)
 				{
 					sObs = sObs + " - Tratamiento Preferencial: " + atr.Value;
 				}
 
+				//// Módulo de internación
+
 				atr = serviceDto.Attributes.SingleOrDefault(a => a.Name == "Módulo de internación");
 				if (atr != null && atr.Value.Length > 2)
 				{
-					sObs = sObs + " Módulo de internación: " + atr.Value;
+					sObs = sObs + " - Módulo de internación: " + atr.Value;
 				}
 
-                DevSetServicio vRdo = new GalenoServicios(connectionStringCache).SetServicio(
+				//// Documento
+
+				string nroDocumento = "";
+
+				atr = serviceDto.Attributes.SingleOrDefault(a => a.Name == "Número de documento");
+				if (atr != null)
+				{
+					sObs = sObs + " - Número de documento: " + atr.Value;
+					nroDocumento = atr.Value;
+				}
+
+				/// Sintomas
+
+				string sSintoma = "";
+
+				try
+				{
+					sSintoma = serviceDto.Triage.Last().Reason.ToUpper();
+
+					if (sSintoma.Contains("EXCLUYE"))
+					{
+						sSintoma = serviceDto.Triage.First().Reason.ToUpper();
+					}
+				}
+				catch (Exception)
+				{
+
+				}
+
+				string localidad = serviceDto.Address.City;
+				string barrio = "";
+
+				if (serviceDto.Address.Neighborhood != "")
+                {
+					barrio = serviceDto.Address.Neighborhood;
+				}
+
+				DevResultado vRdo = new GalenoServicios(connectionStringCache).SetServicio(
 						cliCod,
 						nroAut,
 						serviceDto.Id,
@@ -54,10 +120,12 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 						serviceDto.BeneficiaryName,
 						serviceDto.Gender,
 						serviceDto.Age.HasValue ? MapEdad(serviceDto.Age.Value, serviceDto.AgeUnit) : "",
-						serviceDto.Triage.Last().Reason,
+						sSintoma,
 						serviceDto.phoneNumber,
-						serviceDto.Address.City,
+						localidad,
+						barrio,
 						serviceDto.BeneficiaryID,
+						nroDocumento,
 						new DateTime(serviceDto.TimeRequested.Year, serviceDto.TimeRequested.Month, serviceDto.TimeRequested.Day),
 						$"{serviceDto.TimeRequested.Hour}:{serviceDto.TimeRequested.Minute}",
 						0,
@@ -66,22 +134,25 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 						"",
 						sObs,
 						serviceDto.Address.LatLng.Latitude,
-						serviceDto.Address.LatLng.Longitude
+						serviceDto.Address.LatLng.Longitude,
+						0,
+						serviceDto.Address.AdditionalData
 				);
 
 				if (vRdo == null)
 				{
 					throw new Exception("Error inesperado en GalenoServicios SetServicio ShamanClases.");
 				}
-				else if (!string.IsNullOrEmpty(vRdo.Error))
+				else if (!string.IsNullOrEmpty(vRdo.AlertaError))
 				{
-					if (vRdo.Error.Contains("SERVICIO EXISTENTE"))
+					if (vRdo.AlertaError.ToUpper().Contains("SERVICIO EXISTENTE"))
 						return true;
 					else
-						throw new Exception($"Error inesperado en GalenoServicios SetServicio ShamanClases: {vRdo.Error}.");
+						throw new Exception($"Error inesperado en GalenoServicios SetServicio ShamanClases: {vRdo.AlertaError}.");
 				}
 
 				_logger.Info($"Finalización de almacenamiento de servicio (ID {serviceDto.Id}) en BD.");
+
 				return vRdo.Resultado;
 
 			}
@@ -89,8 +160,71 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 			{
 				_logger.Error(ex, ex.Message);
 				_logger.Info($"Finalización CON ERRORES de almacenamiento de servicio (ID {serviceDto.Id}) en BD.");
-				return false;
+
 			}
+			return false;
+
+		}
+
+		public bool AnulacionEnBaseDedatos(string serviceID)
+		{
+			try
+			{
+				_logger.Info($"Anulación de servicio (ID {serviceID}) en BD...");
+			}
+			catch (Exception ex)
+			{
+				_logger.Error(ex, ex.Message);
+				_logger.Info($"Finalización CON ERRORES de anulación de servicio (ID {serviceID}) en BD.");
+			}
+			return false;
+		}
+
+		private bool EstablecerReiteracion(ServiceDto serviceDto)
+		{
+			try
+			{
+
+				_logger.Info($"Reiteración de servicio (ID {serviceDto.Id}) en BD...");
+
+			}
+			catch (Exception ex)
+			{
+				_logger.Error(ex, ex.Message);
+				_logger.Info($"Finalización CON ERRORES de reiteración de servicio (ID {serviceDto.Id}) en BD.");
+			}
+			return false;
+		}
+
+		public bool ReclamoEnBaseDedatos(string serviceID)
+		{
+			try
+			{
+
+				ConnectionStringCache connectionStringCache = GetConnectionStringCache();
+
+				decimal nroServicio = 0;
+				string nroServicioString = "";
+
+				try
+                {
+					nroServicio = Convert.ToDecimal(serviceID);
+                }
+				catch
+                {
+					nroServicioString = serviceID;
+                }
+
+				return new PamiServicios(connectionStringCache).SetReclamo(cliCod, nroServicio, nroServicioString);
+
+			}
+			catch (Exception ex)
+			{
+				_logger.Error(ex, ex.Message);
+				_logger.Info($"Finalización CON ERRORES del reclamo de servicio (ID {serviceID}) en BD.");
+			}
+			return false;
+
 		}
 
 		public DataTable GetEstadosAsignacion()
@@ -100,10 +234,10 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 			return dt;
 		}
 
-		public bool SetEstadoAsignacionEnviado(decimal pGalenoId, int pEventoId)
+		public bool SetEstadoAsignacionEnviado(decimal pGalenoId, int pEventoId, string pWarning = "")
 		{
 			ConnectionStringCache connectionStringCache = GetConnectionStringCache();
-			return new GalenoServicios(connectionStringCache).SetPamiEventoEnviado(pGalenoId, pEventoId);
+			return new GalenoServicios(connectionStringCache).SetPamiEventoEnviado(pGalenoId, pEventoId, pWarning);
 		}
 
 
@@ -128,12 +262,14 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 			switch (grade.Trim())
 			{
 				case "Verde":
+				case "Verde Teleconsulta":
 					return "V";
 				case "Consulta":
 					return "V";
 				case "Llamadas Grales":
 					return "V";
 				case "Amarillo":
+				case "Amarillo Teleconsulta":
 					return "A";
 				case "Traslado Amaril":
 					return "A";
@@ -146,7 +282,7 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 				case "Sin Clasificar":
 					return "A";
 				case "Super rojo":
-					return "R";
+					return useSuperRojo ? "SR" : "R";
 				case "Rojo":
 					return "R";
 				case "Traslado Rojo":
@@ -159,6 +295,8 @@ namespace IntegracionPAMI.WindowsService.Cache.Services
 					return "R";
 				case "Oficio Clinico":
 					return "R";
+				case "Teleconsulta":
+					return "TA";
 				default:
 					return "R";
 			}
